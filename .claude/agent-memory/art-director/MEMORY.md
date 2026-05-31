@@ -1,0 +1,2 @@
+- [Blade Echo — Game Context](project_blade-echo-context.md) — core concept, pillars, visual identity anchor for 刃响; governs all art direction decisions
+- [Blade Echo — Visual Identity Statement](project_visual-identity-statement.md) — drafted one-liner + 3 production principles for the art bible; pending user approval

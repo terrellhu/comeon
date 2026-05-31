@@ -37,7 +37,7 @@
 #   Each entry: name, status, source, referenced_by[], attributes{}, added, revised
 
 version: 1
-last_updated: ""
+last_updated: "2026-05-31"
 
 # ─── ENTITIES ────────────────────────────────────────────────────────────────
 # Named game-world objects: enemies, NPCs, characters, factions, bosses.
@@ -139,7 +139,337 @@ formulas: []
 #
 # Required fields: name, status, source, referenced_by, value, unit, added
 
-constants: []
+constants:
+  - name: player_max_hp
+    status: active
+    source: design/gdd/health-damage-system.md
+    referenced_by:
+      - design/gdd/health-damage-system.md
+      - design/gdd/instant-retry-system.md   # 重生时玩家 HP 重置为此值
+      - design/gdd/hud-system.md             # 公式1 段数计算 max 参数
+    value: 100
+    unit: hp
+    added: 2026-05-31
+    revised: ""
+
+  - name: player_hp_segments
+    status: active
+    source: design/gdd/health-damage-system.md
+    referenced_by:
+      - design/gdd/health-damage-system.md
+      - design/gdd/hud-system.md             # 公式1 段数上限，5 段 HP 条
+    value: 5
+    unit: segments
+    added: 2026-05-31
+    revised: ""
+
+  - name: hp_per_segment
+    status: active
+    source: design/gdd/health-damage-system.md
+    referenced_by:
+      - design/gdd/health-damage-system.md
+      - design/gdd/hud-system.md             # 公式1 displayed_segments = ceil(current/hp_per_segment)
+    value: 20
+    unit: hp
+    added: 2026-05-31
+    revised: ""
+
+  - name: player_hit_invuln_duration
+    status: active
+    source: design/gdd/health-damage-system.md
+    referenced_by:
+      - design/gdd/health-damage-system.md
+      - design/gdd/instant-retry-system.md   # RETRY_INVULN_BASE 必须严格 > 此值（硬约束下限）
+    value: 0.5
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: counter_base_damage
+    status: active
+    source: design/gdd/health-damage-system.md
+    referenced_by:
+      - design/gdd/health-damage-system.md
+      - design/gdd/counter-attack-combo.md   # 公式1 hit_damage(n) = counter_base_damage × multiplier[n]
+    value: 20
+    unit: hp
+    added: 2026-05-31
+    revised: ""
+
+  - name: boss_max_hp_baseline
+    status: active
+    source: design/gdd/health-damage-system.md
+    referenced_by:
+      - design/gdd/health-damage-system.md
+    value: 1000
+    unit: hp
+    added: 2026-05-31
+    revised: ""
+
+  - name: player_move_speed
+    status: active
+    source: design/gdd/player-controller-system.md
+    referenced_by:
+      - design/gdd/player-controller-system.md
+    value: 340
+    unit: px/s
+    added: 2026-05-31
+    revised: ""
+
+  - name: knockback_speed
+    status: active
+    source: design/gdd/player-controller-system.md
+    referenced_by:
+      - design/gdd/player-controller-system.md
+    value: 200
+    unit: px/s
+    added: 2026-05-31
+    revised: ""
+
+  - name: hit_stun_duration
+    status: active
+    source: design/gdd/player-controller-system.md
+    referenced_by:
+      - design/gdd/player-controller-system.md
+    value: 0.30
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: telegraph_duration_light
+    status: active
+    source: design/gdd/parry-telegraph-system.md
+    referenced_by:
+      - design/gdd/parry-telegraph-system.md
+      - design/gdd/boss-state-machine.md   # Formula 2 (T_eff): T_default[LIGHT] 默认值
+    value: 0.8
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: telegraph_duration_heavy
+    status: active
+    source: design/gdd/parry-telegraph-system.md
+    referenced_by:
+      - design/gdd/parry-telegraph-system.md
+      - design/gdd/boss-state-machine.md   # Formula 2 (T_eff): T_default[HEAVY] 默认值
+    value: 1.2
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: telegraph_duration_sweep
+    status: active
+    source: design/gdd/parry-telegraph-system.md
+    referenced_by:
+      - design/gdd/parry-telegraph-system.md
+      - design/gdd/boss-state-machine.md   # Formula 2 (T_eff): T_default[SWEEP] 默认值
+    value: 1.5
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: window_width_light
+    status: active
+    source: design/gdd/parry-telegraph-system.md
+    referenced_by:
+      - design/gdd/parry-telegraph-system.md
+    value: 0.30
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: window_width_heavy
+    status: active
+    source: design/gdd/parry-telegraph-system.md
+    referenced_by:
+      - design/gdd/parry-telegraph-system.md
+    value: 0.35
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: window_width_sweep
+    status: active
+    source: design/gdd/parry-telegraph-system.md
+    referenced_by:
+      - design/gdd/parry-telegraph-system.md
+    value: 0.45
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: window_open_fraction
+    status: active
+    source: design/gdd/parry-telegraph-system.md
+    referenced_by:
+      - design/gdd/parry-telegraph-system.md
+    value: 0.50
+    unit: fraction
+    added: 2026-05-31
+    revised: ""
+
+  - name: stagger_duration_light
+    status: active
+    source: design/gdd/parry-telegraph-system.md
+    referenced_by:
+      - design/gdd/parry-telegraph-system.md
+      - design/gdd/counter-attack-combo.md   # base_counter_window[LIGHT]=1.0s 基础反击窗口
+      - design/gdd/hud-system.md             # 公式4 反击条 base_counter_window[LIGHT] 分母
+    value: 1.0
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: stagger_duration_heavy
+    status: active
+    source: design/gdd/parry-telegraph-system.md
+    referenced_by:
+      - design/gdd/parry-telegraph-system.md
+      - design/gdd/counter-attack-combo.md   # base_counter_window[HEAVY]=1.5s 基础反击窗口
+      - design/gdd/hud-system.md             # 公式4 反击条 base_counter_window[HEAVY] 分母
+    value: 1.5
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: stagger_duration_sweep
+    status: active
+    source: design/gdd/parry-telegraph-system.md
+    referenced_by:
+      - design/gdd/parry-telegraph-system.md
+      - design/gdd/counter-attack-combo.md   # base_counter_window[SWEEP]=2.0s 基础反击窗口
+      - design/gdd/hud-system.md             # 公式4 反击条 base_counter_window[SWEEP] 分母
+    value: 2.0
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: parry_animation_duration
+    status: active
+    source: design/gdd/parry-telegraph-system.md
+    referenced_by:
+      - design/gdd/parry-telegraph-system.md
+    value: 0.4
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: max_combo_hits
+    status: active
+    source: design/gdd/counter-attack-combo.md
+    referenced_by:
+      - design/gdd/counter-attack-combo.md   # max_hits=3，HUD 系统以此显示 "hit n/3"
+      - design/gdd/hud-system.md             # 连击计数显示 "hit n/3"，分母=3
+    value: 3
+    unit: hits
+    added: 2026-05-31
+    revised: ""
+
+  - name: hit_animation_duration
+    status: active
+    source: design/gdd/counter-attack-combo.md
+    referenced_by:
+      - design/gdd/counter-attack-combo.md   # 公式3 可行性约束推导值，LIGHT 窗口余量 10 帧
+    value: 0.25
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: bonus_stagger_ratio
+    status: active
+    source: design/gdd/counter-attack-combo.md
+    referenced_by:
+      - design/gdd/counter-attack-combo.md   # 公式2 bonus_stagger_duration = base_counter_window × bonus_ratio
+    value: 0.5
+    unit: fraction
+    added: 2026-05-31
+    revised: ""
+
+  - name: retry_invuln_duration
+    status: active
+    source: design/gdd/instant-retry-system.md
+    referenced_by:
+      - design/gdd/instant-retry-system.md   # 公式1 RETRY_INVULN_BASE；重生后无敌时长
+    value: 2.0
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: death_fade_out_duration
+    status: deprecated
+    source: design/gdd/instant-retry-system.md
+    referenced_by:
+      - design/gdd/instant-retry-system.md
+    value: 0.8
+    unit: seconds
+    added: 2026-05-31
+    revised: "2026-05-31"
+    # DEPRECATED: 旧值 0.8s 来自首版 GDD（3s 总重试预算）。Art Bible 7.5 修订后死亡屏幕
+    # 由 4 段固定时长组成（red_flash 0.2s + fade_to_grey 0.4s + phase_symbol_display 0.6s
+    # + symbol_fade_out 0.3s = 1.5s）。新常量分别注册（见下方）。
+
+  - name: retry_prompt_min_duration
+    status: deprecated
+    source: design/gdd/instant-retry-system.md
+    referenced_by:
+      - design/gdd/instant-retry-system.md
+    value: 0.3
+    unit: seconds
+    added: 2026-05-31
+    revised: "2026-05-31"
+    # DEPRECATED: 重试提示界面已被 Art Bible 7.5 移除（死亡屏幕禁止任何 UI 元素和提示文字）。
+    # 玩家任意帧可跳过死亡屏幕，无最短停留要求。
+
+  - name: red_flash_duration
+    status: active
+    source: design/gdd/instant-retry-system.md
+    referenced_by:
+      - design/gdd/instant-retry-system.md   # 公式2 Art Bible 7.5 段1
+    value: 0.2
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: fade_to_grey_duration
+    status: active
+    source: design/gdd/instant-retry-system.md
+    referenced_by:
+      - design/gdd/instant-retry-system.md   # 公式2 Art Bible 7.5 段2
+    value: 0.4
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: phase_symbol_display_duration
+    status: active
+    source: design/gdd/instant-retry-system.md
+    referenced_by:
+      - design/gdd/instant-retry-system.md   # 公式2 Art Bible 7.5 段3
+    value: 0.6
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: symbol_fade_out_duration
+    status: active
+    source: design/gdd/instant-retry-system.md
+    referenced_by:
+      - design/gdd/instant-retry-system.md   # 公式2 Art Bible 7.5 段4
+    value: 0.3
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
+
+  - name: total_death_screen_duration
+    status: active
+    source: design/gdd/instant-retry-system.md
+    referenced_by:
+      - design/gdd/instant-retry-system.md   # 公式2 总和；Art Bible 7.5 硬约束
+    value: 1.5
+    unit: seconds
+    added: 2026-05-31
+    revised: ""
 
 # Example:
 #
