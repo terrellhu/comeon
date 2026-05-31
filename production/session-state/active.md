@@ -109,8 +109,22 @@ From instant-retry-system.md (Art Bible 7.5 同步后):
 - `/gate-check systems-design`: ✅ PASS — Director panel skipped (lean, context efficiency)
 - **production/stage.txt 已更新为 'Technical Setup'**
 
+### /create-architecture 完成（2026-06-01）
+- 产出：docs/architecture/architecture.md v1.0
+- TD Sign-Off: APPROVED WITH CONDITIONS
+- 条件：ADR-001 + ADR-003 必须在第一次 sprint 前 Accepted
+- 72 个技术需求已提取并映射到 5 个架构层
+- 5 个 Required ADR 已识别（见下方）
+
+### Required ADRs（按优先级）
+1. ADR-001: 信号路由架构（EventBus vs 直连）— 所有系统依赖此决策
+2. ADR-002: BossData 资产结构（Resource 子类 vs JSON）
+3. ADR-003: RetryContext + 场景重置策略（in-place reset vs reload）
+4. ADR-004: 玩家状态机架构（Enum-based + CharacterBody2D 集成）
+5. ADR-005: 动画→代码边界（AnimationPlayer.animation_finished vs 计时器）
+
 ### Recommended next
-1. `/create-architecture` — **必需的下一步**，生成主架构蓝图 + 优先级 ADR 列表
+1. `/architecture-decision "Signal Routing Architecture"` — ADR-001（Foundation，必须第一个写）
 2. 建议 ADR 顺序（待 /create-architecture 输出确认）：
    - 信号路由（EventBus vs 节点直连）— 大多数系统的开放问题指向此
    - RetryContext 实现（Autoload vs 场景参数传递）

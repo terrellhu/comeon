@@ -9,7 +9,7 @@
 | Engine | Godot 4.6 |
 | GDDs Covered | health-damage-system, player-controller-system, parry-telegraph-system, boss-state-machine, counter-attack-combo, instant-retry-system, hud-system |
 | ADRs Referenced | None yet (see Required ADRs section) |
-| Technical Director Sign-Off | Pending |
+| Technical Director Sign-Off | 2026-06-01 — APPROVED WITH CONDITIONS (ADR-001 + ADR-003 must be Accepted before first sprint) |
 | Lead Programmer Feasibility | Skipped — Lean mode |
 
 ---
