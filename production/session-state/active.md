@@ -5,7 +5,19 @@
 ## Current Task
 
 **Pre-Production 阶段**（2026-06-01 进入）— Technical Setup → Pre-Production 门关 CONCERNS（无阻塞）通过，已写 stage.txt。
-下一步推荐序：① 协调 CONFLICT-01 → ② ✅ /create-control-manifest（已完成）→ ③ 🔄 /vertical-slice（进行中）→ ④ /ux-design hud → ⑤ /create-epics → ⑥ /sprint-plan
+下一步推荐序：① 协调 CONFLICT-01 → ② ✅ /create-control-manifest → ③ ✅ /vertical-slice（PROCEED）→ ④ ✅ /ux-design hud → ⑤ ✅ /ux-review hud（APPROVED）→ ⑥ 🔄 /create-epics（Foundation 完成）→ ⑦ /create-stories 各 epic → ⑧ /create-epics layer:core → ⑨ /sprint-plan
+HUD spec：design/ux/hud.md（APPROVED）
+
+## /create-epics layer:foundation 完成（2026-06-02）
+3 个 Foundation epic 写入 production/epics/：
+- signal-infrastructure（EventBus + GameEnums；ADR-0001/0002；LOW）
+- bossdata-resource-architecture（BossData Resources + Loader；ADR-0002；MEDIUM；TR-PTS-011 partial 非阻塞）
+- retry-context（RetryContext + HitpauseManager Autoloads；ADR-0003/0005；LOW）
+索引：production/epics/index.md
+下一步：/create-stories signal-infrastructure（按依赖顺序：signal → bossdata → retry）
+Foundation+Core epic 完成后可 /gate-check production
+HUD spec：design/ux/hud.md（Status: Complete, Pending /ux-review）
+关键决策：预警进度条已移除（玩家必须读 Boss 视觉）；GAP-03 解决（CanvasLayer 坐标转换）
 控制清单：docs/architecture/control-manifest.md（版本 2026-06-01）
 
 ## Vertical Slice — 进行中（2026-06-01）
