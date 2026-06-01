@@ -4,7 +4,29 @@
 
 ## Current Task
 
-**Systems Design 阶段** — 7/7 MVP GDDs 已完成，门关验证未通过（需 /review-all-gdds）
+**Pre-Production 阶段**（2026-06-01 进入）— Technical Setup → Pre-Production 门关 CONCERNS（无阻塞）通过，已写 stage.txt。
+下一步推荐序：① 协调 CONFLICT-01 → ② ✅ /create-control-manifest（已完成）→ ③ 🔄 /vertical-slice（进行中）→ ④ /ux-design hud → ⑤ /create-epics → ⑥ /sprint-plan
+控制清单：docs/architecture/control-manifest.md（版本 2026-06-01）
+
+## Vertical Slice — 进行中（2026-06-01）
+**游戏名**：刃响 (Blade Echo)
+**验证问题**：玩家在无引导情况下，能否在 3-5 分钟内体验「读懂→格挡→反击」掌握循环（含 2 阶段 Boss + 多攻击类型 + 死亡屏幕）？架构能否在 10 天内按控制清单质量实现？
+**系统范围**：PlayerController · HealthDamageSystem · ParryTelegraphSystem · BossStateMachine · CounterAttackComboSystem · InstantRetrySystem · HUD · Foundation Autoloads
+**美术质量**：几何占位（ColorRect + Label）
+**目录**：prototypes/blade-echo-vertical-slice/
+**当前阶段**：Phase 4 — Implement（Day 1）
+**Day 3 检查点**：物理响应玩家角色必须可操作，否则停止评估范围
+**成功标准**：
+1. 玩家在无说明下完成一次完整格挡→反击连段
+2. 死亡屏幕 1.5s 后 Boss HP 保留
+3. Phase 2 触发有明显视觉变化
+4. HUD 4 元素实时更新正确
+5. 外部测试者在首次死亡后主动重试
+门关报告：production/gate-checks/gate-check-technical-setup-to-pre-production-2026-06-01.md
+
+---
+
+**[历史] Systems Design 阶段** — 7/7 MVP GDDs 已完成，门关验证未通过（需 /review-all-gdds）
 
 ## Progress Checklist
 
@@ -116,17 +138,50 @@ From instant-retry-system.md (Art Bible 7.5 同步后):
 - 72 个技术需求已提取并映射到 5 个架构层
 - 5 个 Required ADR 已识别（见下方）
 
-### Required ADRs（按优先级）
-1. ADR-001: 信号路由架构（EventBus vs 直连）— 所有系统依赖此决策
-2. ADR-002: BossData 资产结构（Resource 子类 vs JSON）
-3. ADR-003: RetryContext + 场景重置策略（in-place reset vs reload）
-4. ADR-004: 玩家状态机架构（Enum-based + CharacterBody2D 集成）
-5. ADR-005: 动画→代码边界（AnimationPlayer.animation_finished vs 计时器）
+### Required ADRs（全部完成 ✅）
+1. ✅ ADR-0001: 信号路由架构 — EventBus Autoload，直连例外（1:1 controller 信号）
+2. ✅ ADR-0002: BossData 资产结构 — GDScript Resource 子类 (.tres)；GameEnums 共享枚举
+3. ✅ ADR-0003: RetryContext + 场景重置 — Autoload + in-place reset < 100ms
+4. ✅ ADR-0004: 玩家状态机 — enum-based + _transition_to() 中心调度 + CONNECT_ONE_SHOT 模式
+5. ✅ ADR-0005: 动画→代码边界 — CONNECT_ONE_SHOT + HitpauseManager (Engine.time_scale=0)
 
-### Recommended next
-1. `/architecture-decision "Signal Routing Architecture"` — ADR-001（Foundation，必须第一个写）
+### Technical Setup 阶段剩余工作
+- [x] /test-setup — ✅ 创建 tests/ (unit/integration/smoke/evidence) + GUT runner + CI workflow + 示例测试
+- [x] /ux-design — ✅ 创建 accessibility-requirements.md (Standard 段) + interaction-patterns.md (8 模式)
+- [ ] /architecture-review（**新会话**中运行，不在 ADR 同一会话）→ 生成 requirements-traceability.md
+
+### /test-setup 完成（2026-06-01）
+- tests/README.md + gut_runner.gd + unit/ + integration/ + smoke/critical-paths.md + evidence/
+- tests/unit/health_damage/health_damage_test.gd（框架动作确认占位测试）
+- .github/workflows/tests.yml（gdUnit4-action，godot 4.6，main push/PR）
+- 手动待办：Godot AssetLib 安装 GUT 插件并启用
+
+### /ux-design 完成（2026-06-01）
+- design/accessibility-requirements.md — Standard 段（键盘+手柄完整导航 / WCAG-AA / 色非依存三重信号 / 重映射 / Reduce Motion）
+- design/ux/interaction-patterns.md — 8 个模式正式化：Segmented Status Bar / Continuous Bar+Phase Ticks / Contextual Timer Bar / State-Colored Indicator / Hit Counter Badge / Transient Confirmation Flash / Minimal Death Screen / World-Space HUD Element
+
+### Recommended next（**新会话**）
+1. `/architecture-review` — 生成追溯矩阵 (requirements-traceability.md) + TR registry，完成 Technical Setup 阶段
+   - ⚠️ 必须在新会话运行（不与 /architecture-decision 同会话，保证审查独立性）
+2. 之后 `/gate-check technical-setup` — 验证可进入 Pre-Production（预期通过：5 ADR + tests + ux + architecture 齐备）
 2. 建议 ADR 顺序（待 /create-architecture 输出确认）：
    - 信号路由（EventBus vs 节点直连）— 大多数系统的开放问题指向此
    - RetryContext 实现（Autoload vs 场景参数传递）
    - BossData 资产结构（Resource 子类 vs JSON）
    - AnimationPlayer.animation_finished vs 内部计时器（影响 Boss SM AC-04/AC-16）
+
+## Session Extract — /architecture-review 2026-06-01
+- Verdict: **CONCERNS**
+- Requirements: 92 total — 86 covered (93%), 4 partial, 2 gap
+- New TR-IDs registered: 92（tr-registry.yaml 首次实填，复用 ADR 已引用编号）
+- GDD revision flags: None（无 HIGH RISK 引擎发现）
+- Top findings:
+  1. 🔴 CONFLICT-01: ADR-0003 200ms 跳过守卫 vs instant-retry AC-03（任意帧跳过含 RED_FLASH）— 需协调二选一
+  2. ⚠️ GAP-02: 格挡/反击调参存储位置未定义（TR-PTS-011, TR-CAC-002/003/006）— ADR-0002 schema 仅含 telegraph_duration_override；建议 /create-control-manifest 拍板
+  3. ❌ GAP-03: HUD 反击条世界坐标跟随未决（TR-HUD-008）— 留给 /ux-design hud 或新 ADR
+  4. ℹ️ DOC-01: architecture.md「ADRs not written」陈旧表述需更新
+- ADR 依赖排序: 0001→0002→0003→0004→0005，无环，全 Accepted
+- 引擎: Godot 4.6 一致；0 废弃 API；duplicate_deep()(4.5) 正确标注
+- Report: docs/architecture/architecture-review-2026-06-01.md
+- Index: docs/architecture/requirements-traceability.md
+- Pre-gate checklist: tests/unit ✅ · tests/integration ✅ · .github/workflows/tests.yml ✅ · design/accessibility-requirements.md ✅ · design/ux/interaction-patterns.md ✅ — 全部就绪

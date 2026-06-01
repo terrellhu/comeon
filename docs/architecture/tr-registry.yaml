@@ -23,34 +23,669 @@
 #   NNN = three-digit zero-padded sequence per system, starting at 001
 #
 # STATUS VALUES: active | deprecated | superseded-by: TR-[system]-NNN
-
-version: 1
-last_updated: ""
-
-requirements: []
-
-# --- EXAMPLE ENTRIES (remove when first real entries are added) ---
 #
-# - id: TR-combat-001
-#   system: combat
-#   gdd: design/gdd/combat-system.md
-#   requirement: "Player takes damage from enemies based on attack power minus defence"
-#   created: 2026-03-10
-#   revised: ""
-#   status: active
-#
-# - id: TR-combat-002
-#   system: combat
-#   gdd: design/gdd/combat-system.md
-#   requirement: "Combo window timing is 0.4 seconds between hits"
-#   created: 2026-03-10
-#   revised: "2026-04-01"
-#   status: active
-#
-# - id: TR-combat-003
-#   system: combat
-#   gdd: design/gdd/combat-system.md
-#   requirement: "Old damage formula using raw stats"
-#   created: 2026-03-10
-#   revised: ""
-#   status: superseded-by: TR-combat-001
+# NOTE: Initial population by /architecture-review 2026-06-01. IDs cited in
+# ADR-0001..0005 (e.g. TR-HDS-004, TR-PTS-009) are preserved verbatim so
+# existing ADR references stay valid.
+
+version: 2
+last_updated: "2026-06-01"
+
+requirements:
+  # ─── HDS — Health & Damage System (design/gdd/health-damage-system.md) ───
+  - id: TR-HDS-001
+    system: health-damage-system
+    gdd: design/gdd/health-damage-system.md
+    requirement: "Player HP is a continuous float in [0, player_max_hp]; damage enters via apply_damage(target, amount); HealthDamageSystem does not judge whether damage applies"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HDS-002
+    system: health-damage-system
+    gdd: design/gdd/health-damage-system.md
+    requirement: "After a hit the player enters an INVULNERABLE window (player_hit_invuln_duration 0.5s) during which apply_damage(PLAYER) is ignored and the timer does not reset"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HDS-003
+    system: health-damage-system
+    gdd: design/gdd/health-damage-system.md
+    requirement: "Damage clamps current_player_hp to 0; no negative HP ever stored"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HDS-004
+    system: health-damage-system
+    gdd: design/gdd/health-damage-system.md
+    requirement: "current_player_hp <= 0 emits player_died the same frame with no buffer"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HDS-005
+    system: health-damage-system
+    gdd: design/gdd/health-damage-system.md
+    requirement: "Boss HP first crossing a phase threshold emits boss_phase_changed(from, to) exactly once; phase added to entered_phases"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HDS-006
+    system: health-damage-system
+    gdd: design/gdd/health-damage-system.md
+    requirement: "Boss HP <= 0 clamps to 0 and emits boss_defeated exactly once; residual attack frames do not re-emit"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HDS-007
+    system: health-damage-system
+    gdd: design/gdd/health-damage-system.md
+    requirement: "On player death+retry Boss HP is NOT reset; entered_phases persists across retry"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HDS-008
+    system: health-damage-system
+    gdd: design/gdd/health-damage-system.md
+    requirement: "apply_healing(PLAYER, amount) clamps to player_max_hp; HP never exceeds max"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HDS-009
+    system: health-damage-system
+    gdd: design/gdd/health-damage-system.md
+    requirement: "Single damage crossing multiple phase thresholds emits boss_phase_changed in ascending phase order, no phase skipped"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HDS-010
+    system: health-damage-system
+    gdd: design/gdd/health-damage-system.md
+    requirement: "boss_max_hp and phase_threshold_pct[] come from BossData asset; not hardcoded in any .gd file"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HDS-011
+    system: health-damage-system
+    gdd: design/gdd/health-damage-system.md
+    requirement: "apply_damage(PLAYER, 0 or negative) is a no-op: no HP change, no signal, does not consume invuln window"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HDS-012
+    system: health-damage-system
+    gdd: design/gdd/health-damage-system.md
+    requirement: "HUD segment count = (hp<=0) ? 0 : ceil(current_player_hp / hp_per_segment); hp_per_segment = player_max_hp / player_hp_segments"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HDS-013
+    system: health-damage-system
+    gdd: design/gdd/health-damage-system.md
+    requirement: "Emits player_hp_changed(current, max) and boss_hp_changed(current, max, phase) for HUD"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HDS-014
+    system: health-damage-system
+    gdd: design/gdd/health-damage-system.md
+    requirement: "Boss damage intake = counter_base_damage x multiplier[n]; full 3-hit combo = {16,22,32} = 70 HP (multiplier table owned by counter-attack-combo formula 1)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HDS-015
+    system: health-damage-system
+    gdd: design/gdd/health-damage-system.md
+    requirement: "Per-frame processing under 1.0ms across 1000 consecutive damage frames"
+    created: 2026-06-01
+    revised: ""
+    status: active
+
+  # ─── PC — Player Character Controller (design/gdd/player-controller-system.md) ───
+  - id: TR-PC-001
+    system: player-controller-system
+    gdd: design/gdd/player-controller-system.md
+    requirement: "Player uses CharacterBody2D processed via move_and_slide() each physics frame"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PC-002
+    system: player-controller-system
+    gdd: design/gdd/player-controller-system.md
+    requirement: "Complete 7-state machine: IDLE, RUNNING, AIRBORNE, PARRYING, DODGING, HIT_STUN, DEAD"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PC-003
+    system: player-controller-system
+    gdd: design/gdd/player-controller-system.md
+    requirement: "6 InputMap actions (move_left, move_right, jump, parry, dodge, attack); detection references action names only, no hardcoded keycodes"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PC-004
+    system: player-controller-system
+    gdd: design/gdd/player-controller-system.md
+    requirement: "Same-frame parry+dodge: parry wins, dodge ignored (parry priority rule)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PC-005
+    system: player-controller-system
+    gdd: design/gdd/player-controller-system.md
+    requirement: "Coyote time (0.10s) and jump buffer (0.12s) timers"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PC-006
+    system: player-controller-system
+    gdd: design/gdd/player-controller-system.md
+    requirement: "attack input emits attack_input_pressed only in IDLE/RUNNING/AIRBORNE; no state change, no movement lock; ignored in PARRYING/DODGING/HIT_STUN/DEAD"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PC-007
+    system: player-controller-system
+    gdd: design/gdd/player-controller-system.md
+    requirement: "Bidirectional parry contract: emits parry_input_pressed on PARRYING enter; receives exit_parry_state(duration) to leave PARRYING"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PC-008
+    system: player-controller-system
+    gdd: design/gdd/player-controller-system.md
+    requirement: "AIRBORNE gravity accumulation velocity.y += gravity*delta clamped to terminal_velocity; grounded sets velocity.y = 0"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PC-009
+    system: player-controller-system
+    gdd: design/gdd/player-controller-system.md
+    requirement: "HIT_STUN: velocity.x = -facing_direction*knockback_speed for hit_stun_duration; hit_stun_duration <= player_hit_invuln_duration (0.5s)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PC-010
+    system: player-controller-system
+    gdd: design/gdd/player-controller-system.md
+    requirement: "DEAD state entered on player_died from any state; exits ONLY via external retry reset signal; all input disabled"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PC-011
+    system: player-controller-system
+    gdd: design/gdd/player-controller-system.md
+    requirement: "All tuning parameters declared as @export; no numeric literals (340,1400,600,0.10,0.12,200,0.30) in logic code"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PC-012
+    system: player-controller-system
+    gdd: design/gdd/player-controller-system.md
+    requirement: "Horizontal velocity is instant: velocity.x = dir*move_speed, snaps to 0 same frame on release; no acceleration curve or lerp"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PC-013
+    system: player-controller-system
+    gdd: design/gdd/player-controller-system.md
+    requirement: "dodge emits dodge_input_pressed(direction); controller pauses own physics while DodgeSystem controls position, resumes on dodge_ended"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PC-014
+    system: player-controller-system
+    gdd: design/gdd/player-controller-system.md
+    requirement: "Controller _physics_process logic under 0.5ms per frame"
+    created: 2026-06-01
+    revised: ""
+    status: active
+
+  # ─── PTS — Parry & Telegraph System (design/gdd/parry-telegraph-system.md) ───
+  - id: TR-PTS-001
+    system: parry-telegraph-system
+    gdd: design/gdd/parry-telegraph-system.md
+    requirement: "Consumes attack_telegraphed(type: AttackType, damage: float) and transitions IDLE -> TELEGRAPHING"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PTS-002
+    system: parry-telegraph-system
+    gdd: design/gdd/parry-telegraph-system.md
+    requirement: "Three attack types LIGHT/HEAVY/SWEEP with telegraph (0.8/1.2/1.5s), window width (0.30/0.35/0.45s), stagger (1.0/1.5/2.0s)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PTS-003
+    system: parry-telegraph-system
+    gdd: design/gdd/parry-telegraph-system.md
+    requirement: "Window opens at window_open_fraction (0.50) of telegraph_duration: window_open_time = telegraph_duration*fraction; window_close_time = open + width"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PTS-004
+    system: parry-telegraph-system
+    gdd: design/gdd/parry-telegraph-system.md
+    requirement: "Parry success = TELEGRAPHING AND window_open_time <= telegraph_timer <= window_close_time (closed interval, boundaries succeed)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PTS-005
+    system: parry-telegraph-system
+    gdd: design/gdd/parry-telegraph-system.md
+    requirement: "Path A success emits parry_succeeded(attack_type); cancels telegraph; does not call apply_damage; returns to IDLE"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PTS-006
+    system: parry-telegraph-system
+    gdd: design/gdd/parry-telegraph-system.md
+    requirement: "Path B failure: telegraph expires with no success -> apply_damage(PLAYER, damage) + parry_failed(attack_type)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PTS-007
+    system: parry-telegraph-system
+    gdd: design/gdd/parry-telegraph-system.md
+    requirement: "Emits parry_failed(attack_type) to Boss state machine on attack landing"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PTS-008
+    system: parry-telegraph-system
+    gdd: design/gdd/parry-telegraph-system.md
+    requirement: "Every parry_input_pressed (path A/B/C) emits exit_parry_state(parry_animation_duration) same frame"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PTS-009
+    system: parry-telegraph-system
+    gdd: design/gdd/parry-telegraph-system.md
+    requirement: "Emits telegraph_updated(progress, window_open, attack_type) every physics frame during TELEGRAPHING; progress strictly in [0,1]"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PTS-010
+    system: parry-telegraph-system
+    gdd: design/gdd/parry-telegraph-system.md
+    requirement: "STAGGERING state removed; stagger lifecycle (stagger_timer, stagger_ended) owned by CounterAttackComboSystem; system returns IDLE after parry success"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PTS-011
+    system: parry-telegraph-system
+    gdd: design/gdd/parry-telegraph-system.md
+    requirement: "All timing values (telegraph_duration, window_open_fraction, window_width, stagger_duration) injected, not literals; per-Boss override permitted per GDD formula 1"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PTS-012
+    system: parry-telegraph-system
+    gdd: design/gdd/parry-telegraph-system.md
+    requirement: "Second attack_telegraphed while TELEGRAPHING is rejected with warning; existing timer unchanged"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PTS-013
+    system: parry-telegraph-system
+    gdd: design/gdd/parry-telegraph-system.md
+    requirement: "player_died or boss_defeated during telegraph -> immediate IDLE, clear timer, no apply_damage, no parry_failed"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-PTS-014
+    system: parry-telegraph-system
+    gdd: design/gdd/parry-telegraph-system.md
+    requirement: "Path A signal-to-output latency <= 0.5ms at 60fps"
+    created: 2026-06-01
+    revised: ""
+    status: active
+
+  # ─── BSM — Boss State Machine (design/gdd/boss-state-machine.md) ───
+  - id: TR-BSM-001
+    system: boss-state-machine
+    gdd: design/gdd/boss-state-machine.md
+    requirement: "Multi-layer state machine: phase layer / behavior state (IDLE/TELEGRAPHING/ATTACKING/STAGGERED/PHASE_TRANSITION/DEFEATED) / sequence index"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-BSM-002
+    system: boss-state-machine
+    gdd: design/gdd/boss-state-machine.md
+    requirement: "BossData Resource drives all Boss-specific data; all Bosses share one state machine implementation"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-BSM-003
+    system: boss-state-machine
+    gdd: design/gdd/boss-state-machine.md
+    requirement: "telegraph_duration_override = 0 uses AttackType default; >0 overrides effective telegraph duration"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-BSM-004
+    system: boss-state-machine
+    gdd: design/gdd/boss-state-machine.md
+    requirement: "sequence_index advance = (current_index + 1) mod N; phase transition resets to 0; stagger_ended advances index"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-BSM-005
+    system: boss-state-machine
+    gdd: design/gdd/boss-state-machine.md
+    requirement: "STAGGERED entered on parry_succeeded, exited on stagger_ended; boss_defeated interrupts immediately from any state"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-BSM-006
+    system: boss-state-machine
+    gdd: design/gdd/boss-state-machine.md
+    requirement: "attack_telegraphed emitted BEFORE telegraph_timer starts, so parry system never misses the signal"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-BSM-007
+    system: boss-state-machine
+    gdd: design/gdd/boss-state-machine.md
+    requirement: "boss_phase_changed handling across 4 source states (IDLE immediate; TELEGRAPHING/ATTACKING/STAGGERED defer until resolution, then skip idle to PHASE_TRANSITION)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-BSM-008
+    system: boss-state-machine
+    gdd: design/gdd/boss-state-machine.md
+    requirement: "boss_defeated -> DEFEATED terminal from any state; cancels all timers; priority over stagger_ended same frame"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-BSM-009
+    system: boss-state-machine
+    gdd: design/gdd/boss-state-machine.md
+    requirement: "Load-time validation: empty attack_sequence -> error/refuse load; invalid telegraph override -> clamp 0.1s + warning; missing phase_transition_anim -> graceful skip + warning"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-BSM-010
+    system: boss-state-machine
+    gdd: design/gdd/boss-state-machine.md
+    requirement: "ATTACKING->IDLE driven by AnimationPlayer.animation_finished, not a separate timer; no AttackType default-duration literals in .gd"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-BSM-011
+    system: boss-state-machine
+    gdd: design/gdd/boss-state-machine.md
+    requirement: "Subscribes boss_phase_changed(from, to) -> PHASE_TRANSITION at appropriate timing; updates PhaseData and resets sequence_index = 0"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-BSM-012
+    system: boss-state-machine
+    gdd: design/gdd/boss-state-machine.md
+    requirement: "Emits attack_telegraphed via decoupled signal; subscribes parry_succeeded/stagger_ended/parry_failed without direct coupling to parry system"
+    created: 2026-06-01
+    revised: ""
+    status: active
+
+  # ─── CAC — Counter Attack Combo (design/gdd/counter-attack-combo.md) ───
+  - id: TR-CAC-001
+    system: counter-attack-combo
+    gdd: design/gdd/counter-attack-combo.md
+    requirement: "Subscribes parry_succeeded(attack_type) -> COUNTER_WINDOW_OPEN; initializes hit_count=0, max_hits=3, hit_cooldown_active=false"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-CAC-002
+    system: counter-attack-combo
+    gdd: design/gdd/counter-attack-combo.md
+    requirement: "window_timer = base_counter_window[attack_type] (LIGHT 1.0 / HEAVY 1.5 / SWEEP 2.0s), equal to stagger_duration baselines"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-CAC-003
+    system: counter-attack-combo
+    gdd: design/gdd/counter-attack-combo.md
+    requirement: "hit_damage(n) = counter_base_damage x multiplier[n] with multiplier {0.8,1.1,1.6}; values injected from config, not hardcoded"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-CAC-004
+    system: counter-attack-combo
+    gdd: design/gdd/counter-attack-combo.md
+    requirement: "Per-hit cooldown: hit_cooldown_active gates input for hit_animation_duration (0.25s); inputs during cooldown ignored"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-CAC-005
+    system: counter-attack-combo
+    gdd: design/gdd/counter-attack-combo.md
+    requirement: "Reaching max_hits (3) emits counter_full_combo_completed(attack_type) and enters BONUS_STAGGER"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-CAC-006
+    system: counter-attack-combo
+    gdd: design/gdd/counter-attack-combo.md
+    requirement: "bonus_stagger_duration[type] = base_counter_window[type] x bonus_ratio (0.5); bonus_ratio clamped to 0.8 max"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-CAC-007
+    system: counter-attack-combo
+    gdd: design/gdd/counter-attack-combo.md
+    requirement: "CounterAttackComboSystem is the SOLE emitter of stagger_ended (transferred from parry-telegraph system)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-CAC-008
+    system: counter-attack-combo
+    gdd: design/gdd/counter-attack-combo.md
+    requirement: "Emits counter_window_updated(hit_count, time_remaining, state) every physics frame during active window/bonus"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-CAC-009
+    system: counter-attack-combo
+    gdd: design/gdd/counter-attack-combo.md
+    requirement: "Each executed hit calls apply_damage(BOSS, hit_damage); partial combos keep dealt damage (no rollback)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-CAC-010
+    system: counter-attack-combo
+    gdd: design/gdd/counter-attack-combo.md
+    requirement: "Subscribes attack_input_pressed to activate hits; BONUS_STAGGER ignores further attack input"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-CAC-011
+    system: counter-attack-combo
+    gdd: design/gdd/counter-attack-combo.md
+    requirement: "boss_defeated or player_died during window -> immediate IDLE, cancel timers, do NOT emit stagger_ended"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-CAC-012
+    system: counter-attack-combo
+    gdd: design/gdd/counter-attack-combo.md
+    requirement: "Load-time clamp: hit_animation_duration <= 0.307s (LIGHT feasibility) clamp to 0.30; bonus_ratio clamp to 0.8 with warning"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-CAC-013
+    system: counter-attack-combo
+    gdd: design/gdd/counter-attack-combo.md
+    requirement: "Second parry_succeeded during open window rejected with warning; window_timer and hit_count unchanged"
+    created: 2026-06-01
+    revised: ""
+    status: active
+
+  # ─── IRS — Instant Retry System (design/gdd/instant-retry-system.md) ───
+  - id: TR-IRS-001
+    system: instant-retry-system
+    gdd: design/gdd/instant-retry-system.md
+    requirement: "Subscribes player_died as the sole trigger; ignores repeat player_died while already in death-screen sequence"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-IRS-002
+    system: instant-retry-system
+    gdd: design/gdd/instant-retry-system.md
+    requirement: "Death-screen PHASE_SYMBOL uses per-Boss phase_symbol from BossData; missing field -> warning + graceful grey-screen fallback"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-IRS-003
+    system: instant-retry-system
+    gdd: design/gdd/instant-retry-system.md
+    requirement: "Game logic time paused during death screen (Boss/physics frozen); death-screen animation continues"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-IRS-004
+    system: instant-retry-system
+    gdd: design/gdd/instant-retry-system.md
+    requirement: "Any key during death screen skips to RESUMING with no UI feedback; skip shortens wait, retry always occurs"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-IRS-005
+    system: instant-retry-system
+    gdd: design/gdd/instant-retry-system.md
+    requirement: "RetryContext (cross-reset persistent object) saves preserved_boss_hp, preserved_boss_phase, session_death_count"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-IRS-006
+    system: instant-retry-system
+    gdd: design/gdd/instant-retry-system.md
+    requirement: "Scene reset must complete within the 1.5s death-screen window (Art Bible 7.5 hard constraint)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-IRS-007
+    system: instant-retry-system
+    gdd: design/gdd/instant-retry-system.md
+    requirement: "After retry player spawns at full HP (player_max_hp=100) with retry_invuln_duration=2.0s invulnerability (> player_hit_invuln_duration 0.5s)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-IRS-008
+    system: instant-retry-system
+    gdd: design/gdd/instant-retry-system.md
+    requirement: "After retry Boss current_hp = preserved_boss_hp exactly (Boss HP not reset)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-IRS-009
+    system: instant-retry-system
+    gdd: design/gdd/instant-retry-system.md
+    requirement: "After retry Boss state machine reset to IDLE with no in-progress attack; Boss at battle start position"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-IRS-010
+    system: instant-retry-system
+    gdd: design/gdd/instant-retry-system.md
+    requirement: "boss_defeated clears RetryContext.preserved_boss_hp; next entry starts Boss at full HP (new fight, not retry)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-IRS-011
+    system: instant-retry-system
+    gdd: design/gdd/instant-retry-system.md
+    requirement: "session_death_count increments per player_died; HUD receives retry_death_count_changed(count)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-IRS-012
+    system: instant-retry-system
+    gdd: design/gdd/instant-retry-system.md
+    requirement: "Death-screen 1.5s 4-phase sequence: RED_FLASH 0.2s + FADE_TO_GREY 0.4s + PHASE_SYMBOL 0.6s + SYMBOL_FADE_OUT 0.3s (Art Bible 7.5 locked)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-IRS-013
+    system: instant-retry-system
+    gdd: design/gdd/instant-retry-system.md
+    requirement: "Same-frame boss_defeated takes priority over player_died (player-favorable); triggers victory, not death screen"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-IRS-014
+    system: instant-retry-system
+    gdd: design/gdd/instant-retry-system.md
+    requirement: "Death screen contains NO UI elements: no retry button, loading bar, death count text, prompts, or 'you died' text"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-IRS-015
+    system: instant-retry-system
+    gdd: design/gdd/instant-retry-system.md
+    requirement: "No resource penalty on retry; behavior identical regardless of death count (1st vs 50th)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+
+  # ─── HUD — HUD System (design/gdd/hud-system.md) ───
+  - id: TR-HUD-001
+    system: hud-system
+    gdd: design/gdd/hud-system.md
+    requirement: "HUD hosted on CanvasLayer (always above world); independent elements each subscribe their source system"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HUD-002
+    system: hud-system
+    gdd: design/gdd/hud-system.md
+    requirement: "Player HP segment bar subscribes player_hp_changed; renders 5 segments; last-segment critical 0.5Hz flash"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HUD-003
+    system: hud-system
+    gdd: design/gdd/hud-system.md
+    requirement: "Boss HP continuous bar subscribes boss_hp_changed; fill = clamp(current/max,0,1); static phase divider lines from phase_threshold_pct"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HUD-004
+    system: hud-system
+    gdd: design/gdd/hud-system.md
+    requirement: "Telegraph progress indicator subscribes telegraph_updated every frame; PRE/WINDOW_OPEN/POST color states; hidden when no active telegraph"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HUD-005
+    system: hud-system
+    gdd: design/gdd/hud-system.md
+    requirement: "Counter window timer bar + hit counter subscribe counter_window_updated every frame; denominator stays base_counter_window during BONUS_STAGGER; counter_full_combo_completed feedback"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HUD-006
+    system: hud-system
+    gdd: design/gdd/hud-system.md
+    requirement: "Death counter subscribes retry_death_count_changed (signal reserved in MVP, not displayed)"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HUD-007
+    system: hud-system
+    gdd: design/gdd/hud-system.md
+    requirement: "HUD is pure subscriber: emits no signals, never modifies game state; unsubscribes stream signals on boss_defeated"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HUD-008
+    system: hud-system
+    gdd: design/gdd/hud-system.md
+    requirement: "Counter window bar follows player in world coordinates (screen-transform vs Node2D world layer); implementation method to be decided"
+    created: 2026-06-01
+    revised: ""
+    status: active
+  - id: TR-HUD-009
+    system: hud-system
+    gdd: design/gdd/hud-system.md
+    requirement: "Per-frame HUD update is O(1) with no per-frame allocation, up to 144Hz stream-signal rate"
+    created: 2026-06-01
+    revised: ""
+    status: active

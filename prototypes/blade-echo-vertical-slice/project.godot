@@ -1,0 +1,29 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Blade Echo — Vertical Slice"
+config/description="Parry-counter mastery loop — full architectural vertical slice. NOT FOR PRODUCTION."
+config/version="0.1.0-vs"
+run/main_scene="res://scenes/main_arena.tscn"
+config/features=PackedStringArray("4.6", "Forward Plus")
+
+[autoload]
+
+EventBus="*res://autoloads/event_bus.gd"
+RetryContext="*res://autoloads/retry_context.gd"
+HitpauseManager="*res://autoloads/hitpause_manager.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
