@@ -58,11 +58,28 @@ HUD spec：design/ux/hud.md（APPROVED）
 
 ## Session Extract — /dev-story 2026-06-02 (health-damage story-004)
 - Story: production/epics/health-damage-system/story-004-player-healing.md — Healing Application and Over-Heal Guard
-- Files changed: game/scripts/core/health_damage_system.gd (modified — apply_healing method added), game/tests/unit/health_damage/test_player_healing.gd (new, 5 test functions)
-- Test written: game/tests/unit/health_damage/test_player_healing.gd (5/5 PASS; 134/139 total suite)
-- Notes: Agent omitted target param and added full-HP early return (violates AC-3) — both fixed before tests run; test file rewritten from scratch to match project patterns and story ACs exactly
+- Files changed: game/scripts/core/health_damage_system.gd (modified — apply_healing method added + amount guard), game/tests/unit/health_damage/test_player_healing.gd (new, 7 test functions)
+- Test written: game/tests/unit/health_damage/test_player_healing.gd (7/7 PASS; code review added 2 tests: negative guard + invuln invariant)
+- Notes: /code-review found BLOCKING (_system: Node → HealthDamageSystem), 2 WARNINGs (missing guard, missing tests) — all fixed before APPROVED
 - Blockers: None
-- Next: /code-review game/scripts/core/health_damage_system.gd game/tests/unit/health_damage/test_player_healing.gd then /story-done production/epics/health-damage-system/story-004-player-healing.md
+
+## Session Extract — /story-done 2026-06-02 (health-damage story-004)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/health-damage-system/story-004-player-healing.md — Healing Application and Over-Heal Guard
+- Tech debt logged: None (ADVISORY guard deviation noted in story completion notes only)
+- Next recommended: Story 006 (HUD Segment Formula) or Story 007 (Retry HP Reset) — both independent
+
+## Session Extract — /dev-story 2026-06-02 (health-damage story-006)
+- Story: production/epics/health-damage-system/story-006-hud-segment-formula.md — HUD Segment Count Formula
+- Files changed: game/scripts/core/health_damage_system.gd (modified — get_displayed_segments() + init_battle assert), game/tests/unit/health_damage/test_hud_segments.gd (new, 5 test functions)
+- Test written: game/tests/unit/health_damage/test_hud_segments.gd (5 tests — AC-1 above boundary, AC-2 integer boundary, AC-3 zero guard, AC-4 trace HP, AC-5 full HP)
+- Blockers: None
+
+## Session Extract — /story-done 2026-06-02 (health-damage story-006)
+- Verdict: COMPLETE
+- Story: production/epics/health-damage-system/story-006-hud-segment-formula.md — HUD Segment Count Formula
+- Tech debt logged: None (OUT OF SCOPE advisory in completion notes only)
+- Next recommended: Story 007 (Retry HP Reset Contract) — Integration type, M estimate
 
 ## Session Extract — /story-done 2026-06-02 (health-damage story-005)
 - Verdict: COMPLETE WITH NOTES
@@ -342,3 +359,27 @@ From instant-retry-system.md (Art Bible 7.5 同步后):
 - Report: docs/architecture/architecture-review-2026-06-01.md
 - Index: docs/architecture/requirements-traceability.md
 - Pre-gate checklist: tests/unit ✅ · tests/integration ✅ · .github/workflows/tests.yml ✅ · design/accessibility-requirements.md ✅ · design/ux/interaction-patterns.md ✅ — 全部就绪
+
+
+## Session Extract — /dev-story 2026-06-03 (retry-context story-001)
+- Story: production/epics/retry-context/story-001-retry-context-autoload.md — RetryContext Autoload
+- Files changed: game/autoloads/retry_context.gd (new, 105 lines), game/tests/unit/retry_context/retry_context_test.gd (new, 13 test functions), game/project.godot (RetryContext Autoload 등록)
+- Test written: game/tests/unit/retry_context/retry_context_test.gd (13 functions — 3×AC-04 round-trip, 4×AC-10 clear, 2×AC-13 death_count, 4×AC-is_fresh_start)
+- Blockers: None
+- KEY REMINDER: new class_name scripts need class-cache regen. Run: `C:\game\godot\Godot_v4.6.2-stable_win64_console.exe --headless --editor --quit --path C:\game\comeon\game`
+- Next: /code-review game/autoloads/retry_context.gd game/tests/unit/retry_context/retry_context_test.gd then /story-done production/epics/retry-context/story-001-retry-context-autoload.md
+
+## Session Extract — /story-done 2026-06-03 (retry-context story-001)
+- Verdict: COMPLETE
+- Story: production/epics/retry-context/story-001-retry-context-autoload.md — RetryContext Autoload
+- Tests: 13/13 passed (GUT headless, 0.479s)
+- Tech debt logged: None
+- Next recommended: Story 002 — HitpauseManager Autoload + Runtime Verification
+
+## Session Extract — /dev-story 2026-06-03 (retry-context story-002)
+- Story: production/epics/retry-context/story-002-hitpause-manager-autoload.md — HitpauseManager Autoload + Runtime Verification
+- Files changed: game/autoloads/hitpause_manager.gd (new, 61 lines), game/tests/unit/hitpause/hitpause_manager_test.gd (new, 4 pass + 3 pending), game/project.godot (HitpauseManager Autoload 등록)
+- Test written: game/tests/unit/hitpause/hitpause_manager_test.gd (4 automated pass, 3 pending — AC-timing/AC-timer-verify/AC-independence는 수동 런타임 검증 필요)
+- Known warning: "8 unfreed children" — test_time_scale_set_to_zero_on_trigger의 999s timer가 lingering; 기능 문제 없음
+- Blockers: None (AC-timing 등 수동 검증은 /story-done에서 처리)
+- Next: /code-review game/autoloads/hitpause_manager.gd game/tests/unit/hitpause/hitpause_manager_test.gd then /story-done production/epics/retry-context/story-002-hitpause-manager-autoload.md

@@ -16,3 +16,5 @@ config/features=PackedStringArray("4.6", "Forward Plus")
 [autoload]
 
 EventBus="*res://autoloads/event_bus.gd"
+RetryContext="*res://autoloads/retry_context.gd"
+HitpauseManager="*res://autoloads/hitpause_manager.gd"

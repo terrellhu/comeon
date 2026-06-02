@@ -1,7 +1,7 @@
 # Story 004: Healing Application and Over-Heal Guard
 
 > **Epic**: HealthDamageSystem
-> **Status**: Ready
+> **Status**: Complete
 > **Layer**: Core
 > **Type**: Logic
 > **Estimate**: S (1 hour)
@@ -84,3 +84,11 @@
 
 - Depends on: Story 001 (HP initialization) must be DONE
 - Unlocks: None directly (Healing System story in vertical-slice epic will depend on this)
+
+## Completion Notes
+
+**Completed**: 2026-06-02
+**Criteria**: 3/3 passing (all ACs auto-verified by unit tests)
+**Deviations**: ADVISORY — `apply_healing` gained `amount <= 0.0` guard not in story spec; added during code review for symmetry with `apply_damage`. Does not contradict GDD or ADR-0001.
+**Test Evidence**: Logic — `game/tests/unit/health_damage/test_player_healing.gd` (7 tests: 5 ACs + 2 added by code review for negative guard + invuln timer invariant)
+**Code Review**: Complete — `/code-review` verdict APPROVED (fixed 1 BLOCKING type annotation + 2 WARNINGs: missing guard + missing tests)

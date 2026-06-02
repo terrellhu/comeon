@@ -9,7 +9,7 @@ Engine: Godot 4.6
 |------|-------|-----------------|-----|---------|--------|
 | [signal-infrastructure](signal-infrastructure/EPIC.md) | Foundation | EventBus + GameEnums | N/A (infrastructure) | 3 stories | Ready |
 | [bossdata-resource-architecture](bossdata-resource-architecture/EPIC.md) | Foundation | BossData Resources + BossDataLoader | boss-state-machine.md | 3 stories | Ready |
-| [retry-context](retry-context/EPIC.md) | Foundation | RetryContext + HitpauseManager Autoloads | instant-retry-system.md | Not yet created | Ready |
+| [retry-context](retry-context/EPIC.md) | Foundation | RetryContext + HitpauseManager Autoloads | instant-retry-system.md | 2 stories | Ready |
 
 ## Core Layer
 

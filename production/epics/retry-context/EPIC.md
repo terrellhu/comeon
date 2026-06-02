@@ -5,7 +5,7 @@
 > **Architecture Module**: RetryContext Autoload + HitpauseManager Autoload (architecture.md Foundation Layer)
 > **Manifest Version**: 2026-06-01
 > **Status**: Ready
-> **Stories**: Not yet created — run `/create-stories retry-context`
+> **Stories**: 2 stories
 
 ## Overview
 
@@ -58,6 +58,13 @@ This epic is complete when:
 - Runtime verification of the time_scale+real-timer interaction passes on target hardware
 - All stories implemented, reviewed, and closed via `/story-done`
 
+## Stories
+
+| # | Story | Type | Status | ADR |
+|---|-------|------|--------|-----|
+| 001 | [RetryContext Autoload](story-001-retry-context-autoload.md) | Logic | Ready | ADR-0003 |
+| 002 | [HitpauseManager Autoload + Runtime Verification](story-002-hitpause-manager-autoload.md) | Logic | Ready | ADR-0005 |
+
 ## Next Step
 
-Run `/create-stories retry-context` to break this epic into implementable stories.
+Run `/story-readiness production/epics/retry-context/story-001-retry-context-autoload.md` to validate before implementation.

@@ -22,8 +22,8 @@ const MockEventBusClass = preload("res://tests/helpers/mock_event_bus.gd")
 # Shared state
 # ---------------------------------------------------------------------------
 
-var _system: Node
-var _mock_bus: Node
+var _system: HealthDamageSystem
+var _mock_bus: MockEventBus
 
 # ---------------------------------------------------------------------------
 # Setup / teardown
@@ -102,11 +102,6 @@ func test_apply_healing_player_overheal_clamps_to_max() -> void:
 		100.0,
 		"Over-heal of 40 from 80 HP must clamp to 100.0, never store 120.0"
 	)
-	assert_ne(
-		_system.current_player_hp,
-		120.0,
-		"current_player_hp must never exceed player_max_hp"
-	)
 
 # ---------------------------------------------------------------------------
 # AC-3: Heal at full HP — HP unchanged; player_hp_changed still emitted
@@ -138,3 +133,42 @@ func test_apply_healing_player_at_full_hp_still_emits_signal() -> void:
 		"player_hp_changed current must be 100.0")
 	assert_eq(_mock_bus.last_player_hp_changed_max, 100.0,
 		"player_hp_changed max_hp must be 100.0")
+
+# ---------------------------------------------------------------------------
+# Guard: zero / negative amount — no-op, no signal
+# ---------------------------------------------------------------------------
+
+func test_apply_healing_player_negative_amount_is_noop() -> void:
+	# amount <= 0.0 guard — mirrors apply_damage guard for symmetry
+	_system.current_player_hp = 80.0
+
+	_system.apply_healing(GameEnumsClass.Target.PLAYER, -10.0)
+
+	assert_eq(
+		_system.current_player_hp,
+		80.0,
+		"Negative amount must be a no-op — HP must not decrease"
+	)
+	assert_eq(
+		_mock_bus.player_hp_changed_call_count,
+		0,
+		"player_hp_changed must not emit for negative amount"
+	)
+
+# ---------------------------------------------------------------------------
+# Invariant: healing does not modify _invuln_timer
+# ---------------------------------------------------------------------------
+
+func test_apply_healing_player_does_not_modify_invuln_timer() -> void:
+	# Arrange — set invuln timer via damage, then heal
+	_system.apply_damage(GameEnumsClass.Target.PLAYER, 10.0)
+	var timer_before: float = _system.get_invuln_timer()
+	assert_gt(timer_before, 0.0, "Pre-condition: invuln timer must be active after damage")
+
+	_system.apply_healing(GameEnumsClass.Target.PLAYER, 20.0)
+
+	assert_eq(
+		_system.get_invuln_timer(),
+		timer_before,
+		"apply_healing must not clear or modify the invuln timer"
+	)

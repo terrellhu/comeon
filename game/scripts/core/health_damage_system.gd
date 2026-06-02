@@ -111,6 +111,7 @@ func initialize(event_bus: Node = null) -> void:
 func init_battle(boss_data: BossData) -> void:
 	assert(boss_data != null, "HealthDamageSystem.init_battle: boss_data must not be null")
 	assert(boss_data.boss_max_hp > 0.0, "HealthDamageSystem.init_battle: boss_max_hp must be > 0")
+	assert(player_hp_segments > 0, "HealthDamageSystem.init_battle: player_hp_segments must be > 0")
 
 	_boss_data = boss_data
 	boss_max_hp = boss_data.boss_max_hp
@@ -198,8 +199,11 @@ func apply_damage(target: GameEnums.Target, amount: float) -> void:
 
 ## Restores [param amount] of HP to [param target], clamped to [member player_max_hp].
 ##
-## Emits [signal EventBus.player_hp_changed] on every call, including when already
-## at full HP (heal at full is not an error — AC-3).
+## Guards (applied in order):
+## 1. If [param amount] <= 0.0: no-op — no HP change, no signal.
+##
+## Emits [signal EventBus.player_hp_changed] on every valid call, including when
+## already at full HP (heal at full is not an error — AC-3).
 ## BOSS target is not used in MVP; logs a warning and returns.
 ##
 ## Healing does NOT clear or modify [member _invuln_timer].
@@ -208,6 +212,9 @@ func apply_damage(target: GameEnums.Target, amount: float) -> void:
 @warning_ignore("unsafe_property_access")
 func apply_healing(target: GameEnums.Target, amount: float) -> void:
 	assert(_event_bus != null, "HealthDamageSystem.apply_healing: call initialize() before use")
+	# Guard — zero or negative amount is always a no-op (mirrors apply_damage guard)
+	if amount <= 0.0:
+		return
 	if target == GameEnums.Target.PLAYER:
 		current_player_hp = minf(current_player_hp + amount, player_max_hp)
 		_event_bus.player_hp_changed.emit(current_player_hp, player_max_hp)
@@ -222,6 +229,28 @@ func apply_healing(target: GameEnums.Target, amount: float) -> void:
 ## Intended for GUT tests and HUD reads. Do not write to [member _invuln_timer] directly.
 func get_invuln_timer() -> float:
 	return _invuln_timer
+
+
+## Returns the number of filled HP segments to display in the HUD.
+##
+## Formula: [code](hp <= 0) ? 0 : ceili(current_player_hp / hp_per_segment)[/code]
+## where [code]hp_per_segment = player_max_hp / player_hp_segments[/code].
+##
+## The HP=0 guard fires before the formula so the special case is explicit —
+## [code]ceil(0/20) = 0[/code] would give the same result, but the guard
+## is required by GDD for clarity (a dead player must explicitly return 0).
+## Divide-by-zero for [member player_hp_segments] = 0 is prevented by the
+## assertion in [method init_battle].
+##
+## Uses [method ceili] (integer ceil) to high-estimate remaining HP: a player
+## at 61/100 sees 4 of 5 segments (not 3) until the segment boundary is reached.
+##
+## [b]Source:[/b] TR-HDS-012, Story 006
+func get_displayed_segments() -> int:
+	if current_player_hp <= 0.0:
+		return 0
+	var hp_per_segment: float = player_max_hp / float(player_hp_segments)
+	return ceili(current_player_hp / hp_per_segment)
 
 # ---------------------------------------------------------------------------
 # Private — boss phase detection (Story 005)

@@ -1,12 +1,12 @@
 # Story 006: HUD Segment Count Formula
 
 > **Epic**: HealthDamageSystem
-> **Status**: Ready
+> **Status**: Complete
 > **Layer**: Core
 > **Type**: Logic
 > **Estimate**: S (1 hour)
 > **Manifest Version**: 2026-06-01
-> **Last Updated**: —
+> **Last Updated**: 2026-06-02
 
 ## Context
 
@@ -87,3 +87,11 @@ func get_displayed_segments() -> int:
 
 - Depends on: Story 001 (HP initialization — `player_max_hp` and `player_hp_segments` must be exported)
 - Unlocks: HUD System stories (Presentation layer)
+
+## Completion Notes
+
+**Completed**: 2026-06-02
+**Criteria**: 5/5 passing (all ACs auto-verified by unit tests)
+**Deviations**: OUT OF SCOPE (ADVISORY) — `init_battle()` gained `assert(player_hp_segments > 0)` not in story scope; added during code review to back the doc comment's divide-by-zero protection claim. Backward-compatible.
+**Test Evidence**: Logic — `game/tests/unit/health_damage/test_hud_segments.gd` (5 tests covering all ACs)
+**Code Review**: Complete — `/code-review` verdict APPROVED (2 rounds: fixed inaccurate doc comment + added init_battle assert)
