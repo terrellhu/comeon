@@ -1,19 +1,22 @@
 # Epics Index
 
-Last Updated: 2026-06-02
+Last Updated: 2026-06-02 (Core layer added)
 Engine: Godot 4.6
 
 ## Foundation Layer
 
 | Epic | Layer | System / Module | GDD | Stories | Status |
 |------|-------|-----------------|-----|---------|--------|
-| [signal-infrastructure](signal-infrastructure/EPIC.md) | Foundation | EventBus + GameEnums | N/A (infrastructure) | Not yet created | Ready |
-| [bossdata-resource-architecture](bossdata-resource-architecture/EPIC.md) | Foundation | BossData Resources + BossDataLoader | boss-state-machine.md | Not yet created | Ready |
+| [signal-infrastructure](signal-infrastructure/EPIC.md) | Foundation | EventBus + GameEnums | N/A (infrastructure) | 3 stories | Ready |
+| [bossdata-resource-architecture](bossdata-resource-architecture/EPIC.md) | Foundation | BossData Resources + BossDataLoader | boss-state-machine.md | 3 stories | Ready |
 | [retry-context](retry-context/EPIC.md) | Foundation | RetryContext + HitpauseManager Autoloads | instant-retry-system.md | Not yet created | Ready |
 
 ## Core Layer
 
-*Not yet created — run `/create-epics layer:core` after Foundation stories are underway.*
+| Epic | Layer | System | GDD | Stories | Status |
+|------|-------|--------|-----|---------|--------|
+| [health-damage-system](health-damage-system/EPIC.md) | Core | HealthDamageSystem | health-damage-system.md | 7 stories | Ready |
+| [player-controller](player-controller/EPIC.md) | Core | PlayerController | player-controller-system.md | Not yet created | Ready |
 
 ## Feature Layer
 

@@ -1,0 +1,62 @@
+[gd_resource type="Resource" script_class="BossData" format=3 uid="uid://dtbpqt6fadhnd"]
+
+[ext_resource type="Script" path="res://scripts/data/attack_data.gd" id="3_atkdt"]
+[ext_resource type="Script" path="res://scripts/data/phase_data.gd" id="1_smdn7"]
+[ext_resource type="Script" path="res://scripts/data/boss_data.gd" id="2_mijcc"]
+
+[sub_resource type="Resource" id="AttackData_0"]
+script = ExtResource("3_atkdt")
+attack_type = 0
+damage = 15.0
+telegraph_duration_override = 0.0
+
+[sub_resource type="Resource" id="AttackData_1"]
+script = ExtResource("3_atkdt")
+attack_type = 1
+damage = 25.0
+telegraph_duration_override = 0.0
+
+[sub_resource type="Resource" id="AttackData_2"]
+script = ExtResource("3_atkdt")
+attack_type = 2
+damage = 20.0
+telegraph_duration_override = 0.0
+
+[sub_resource type="Resource" id="AttackData_3"]
+script = ExtResource("3_atkdt")
+attack_type = 1
+damage = 30.0
+telegraph_duration_override = 1.0
+
+[sub_resource type="Resource" id="AttackData_4"]
+script = ExtResource("3_atkdt")
+attack_type = 2
+damage = 25.0
+telegraph_duration_override = 0.0
+
+[sub_resource type="Resource" id="AttackData_5"]
+script = ExtResource("3_atkdt")
+attack_type = 0
+damage = 15.0
+telegraph_duration_override = 0.5
+
+[sub_resource type="Resource" id="PhaseData_0"]
+script = ExtResource("1_smdn7")
+phase_index = 0
+attack_sequence = [SubResource("AttackData_0"), SubResource("AttackData_1"), SubResource("AttackData_2")]
+idle_duration_after_attack = 0.5
+phase_transition_anim = &""
+
+[sub_resource type="Resource" id="PhaseData_1"]
+script = ExtResource("1_smdn7")
+phase_index = 1
+attack_sequence = [SubResource("AttackData_3"), SubResource("AttackData_4"), SubResource("AttackData_5")]
+idle_duration_after_attack = 0.4
+phase_transition_anim = &""
+
+[resource]
+script = ExtResource("2_mijcc")
+boss_id = &"boss_01"
+boss_max_hp = 1000.0
+phase_threshold_pct = [0.6, 0.3]
+phases = [SubResource("PhaseData_0"), SubResource("PhaseData_1")]

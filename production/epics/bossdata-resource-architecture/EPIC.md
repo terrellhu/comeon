@@ -62,6 +62,14 @@ This epic is complete when:
 - `grep` confirms no BossData literals (1000.0, 0.8, 1.2, 1.5) in BossStateMachine code
 - All stories implemented, reviewed, and closed via `/story-done`
 
+## Stories
+
+| # | Story | Type | Status | ADR |
+|---|-------|------|--------|-----|
+| 001 | [BossData Resource Class Hierarchy](story-001-bossdata-resources.md) | Logic | Ready | ADR-0002 |
+| 002 | [BossDataLoader — Load and Validate](story-002-boss-data-loader.md) | Logic | Ready | ADR-0002 |
+| 003 | [MVP Boss Data Asset + GUT Factory Proof](story-003-mvp-boss-asset.md) | Logic | Ready | ADR-0002 |
+
 ## Next Step
 
-Run `/create-stories bossdata-resource-architecture` to break this epic into implementable stories.
+Run `/story-readiness production/epics/bossdata-resource-architecture/story-001-bossdata-resources.md` to begin implementation.

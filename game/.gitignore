@@ -1,0 +1,11 @@
+# Godot-generated data
+.godot/
+
+# Import cache
+*.import
+
+# Export presets (may contain credentials)
+export_presets.cfg
+
+# macOS metadata
+.DS_Store

@@ -58,6 +58,14 @@ This epic is complete when:
 - GUT test confirms `initialize(mock_bus)` injection pattern works
 - All stories implemented, reviewed, and closed via `/story-done`
 
+## Stories
+
+| # | Story | Type | Status | ADR |
+|---|-------|------|--------|-----|
+| 001 | [GameEnums — Shared Enum Definitions](story-001-game-enums.md) | Logic | Ready | ADR-0002 |
+| 002 | [EventBus Autoload — Typed Signal Declarations](story-002-event-bus-signals.md) | Logic | Ready | ADR-0001 |
+| 003 | [EventBus GUT Testability — Mock Injection Validation](story-003-event-bus-injection-test.md) | Integration | Ready | ADR-0001 |
+
 ## Next Step
 
-Run `/create-stories signal-infrastructure` to break this epic into implementable stories.
+Run `/story-readiness production/epics/signal-infrastructure/story-001-game-enums.md` to begin implementation.

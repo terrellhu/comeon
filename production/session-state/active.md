@@ -1,12 +1,157 @@
 # Session State — 刃响 (Blade Echo)
 
-*Updated: 2026-06-01*
+*Updated: 2026-06-02*
+
+## Session Extract — /dev-story 2026-06-02 (health-damage story-001)
+- Story: production/epics/health-damage-system/story-001-hp-initialization.md — HP Initialization and BossData Contract
+- Files changed: game/scripts/core/health_damage_system.gd (new, 93 lines), game/tests/unit/health_damage/test_hp_initialization.gd (new, 11 test functions)
+- Test written: game/tests/unit/health_damage/test_hp_initialization.gd (11 functions — 5×AC-1 player HP, 4×AC-2 boss HP, 2×AC-3 no literals)
+- Notes: get_displayed_segments() deferred to Story 006 (out of scope); _ready() not added (production wiring left to scene setup or Story 002); AC-1 HUD segment test computes formula inline since method not yet implemented
+- Blockers: None
+- KEY REMINDER: new class_name scripts need class-cache regen before headless GUT sees HealthDamageSystem. Run: `C:\game\godot\Godot_v4.6.2-stable_win64_console.exe --headless --editor --quit --path C:\game\comeon\game`
+- Next: /code-review game/scripts/core/health_damage_system.gd game/tests/unit/health_damage/test_hp_initialization.gd then /story-done production/epics/health-damage-system/story-001-hp-initialization.md
+
+## Session Extract — /story-done 2026-06-02 (health-damage story-001)
+- Verdict: COMPLETE
+- Story: production/epics/health-damage-system/story-001-hp-initialization.md — HP Initialization and BossData Contract
+- Tech debt logged: None
+- Next recommended: Story 002 — Player Damage Application and Invulnerability Window
+
+## Session Extract — /dev-story 2026-06-02 (health-damage story-002)
+- Story: production/epics/health-damage-system/story-002-player-damage-and-invuln.md — Player Damage Application and Invulnerability Window
+- Files changed: game/scripts/core/health_damage_system.gd (modified — _invuln_timer, _physics_process, apply_damage, get_invuln_timer), game/tests/unit/health_damage/test_player_damage_invuln.gd (new, 15 functions), game/tests/helpers/mock_event_bus.gd (modified — additive tracking fields; scope deviation, backward-compatible)
+- Test written: game/tests/unit/health_damage/test_player_damage_invuln.gd (15 tests — 26/26 total suite pass)
+- Blockers: None. Scope deviation on mock_event_bus.gd — additive only, Story 001 regression-free.
+- Next: /code-review game/scripts/core/health_damage_system.gd game/tests/unit/health_damage/test_player_damage_invuln.gd then /story-done production/epics/health-damage-system/story-002-player-damage-and-invuln.md
+
+## Session Extract — /story-done 2026-06-02 (health-damage story-002)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/health-damage-system/story-002-player-damage-and-invuln.md — Player Damage Application and Invulnerability Window
+- Tech debt logged: None (advisory test gaps noted in completion notes only)
+- Next recommended: Story 003 — Player Death Detection and HP Clamping
+
+## Session Extract — /dev-story 2026-06-02 (health-damage story-003)
+- Story: production/epics/health-damage-system/story-003-player-death.md — Player Death Detection and HP Clamping
+- Files changed: game/scripts/core/health_damage_system.gd (modified — death check in apply_damage), game/tests/unit/health_damage/test_player_death.gd (new, 10 functions), game/tests/helpers/mock_event_bus.gd (modified — player_died_call_count tracking added)
+- Test written: game/tests/unit/health_damage/test_player_death.gd (10 tests — 36/36 total suite pass)
+- Blockers: None. mock_event_bus.gd modified again (additive, backward-compatible; same pattern as Story 002).
+- Next: /code-review game/scripts/core/health_damage_system.gd game/tests/unit/health_damage/test_player_death.gd then /story-done production/epics/health-damage-system/story-003-player-death.md
+
+## Session Extract — /story-done 2026-06-02 (health-damage story-003)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/health-damage-system/story-003-player-death.md — Player Death Detection and HP Clamping
+- Tech debt logged: None (advisory edge cases noted in completion notes only — post-invuln-expiry + zero-invuln duplicate player_died)
+- Next recommended: Story 004 (Healing) or Story 006 (HUD Segment Formula) — both independent; Story 005 (Boss HP) also ready
 
 ## Current Task
 
 **Pre-Production 阶段**（2026-06-01 进入）— Technical Setup → Pre-Production 门关 CONCERNS（无阻塞）通过，已写 stage.txt。
 下一步推荐序：① 协调 CONFLICT-01 → ② ✅ /create-control-manifest → ③ ✅ /vertical-slice（PROCEED）→ ④ ✅ /ux-design hud → ⑤ ✅ /ux-review hud（APPROVED）→ ⑥ 🔄 /create-epics（Foundation 完成）→ ⑦ /create-stories 各 epic → ⑧ /create-epics layer:core → ⑨ /sprint-plan
 HUD spec：design/ux/hud.md（APPROVED）
+
+## Session Extract — /dev-story 2026-06-02 (bossdata story-003)
+- Story: production/epics/bossdata-resource-architecture/story-003-mvp-boss-asset.md — MVP Boss Data Asset + GUT Factory Proof
+- Files changed: game/data/bosses/boss_01.tres (filled), game/tests/unit/bossdata-resource-architecture/test_boss_factory.gd (new, 6 functions)
+- Verified: Godot headless load OK (phases=2, max_hp=1000, threshold=[0.6,0.3]); GUT 6/6 pass; AC-5 grep clean
+- Blockers: None
+- Next: /code-review game/data/bosses/boss_01.tres game/tests/unit/bossdata-resource-architecture/test_boss_factory.gd then /story-done production/epics/bossdata-resource-architecture/story-003-mvp-boss-asset.md
+
+## Session Extract — /dev-story 2026-06-02 (health-damage story-004)
+- Story: production/epics/health-damage-system/story-004-player-healing.md — Healing Application and Over-Heal Guard
+- Files changed: game/scripts/core/health_damage_system.gd (modified — apply_healing method added), game/tests/unit/health_damage/test_player_healing.gd (new, 5 test functions)
+- Test written: game/tests/unit/health_damage/test_player_healing.gd (5/5 PASS; 134/139 total suite)
+- Notes: Agent omitted target param and added full-HP early return (violates AC-3) — both fixed before tests run; test file rewritten from scratch to match project patterns and story ACs exactly
+- Blockers: None
+- Next: /code-review game/scripts/core/health_damage_system.gd game/tests/unit/health_damage/test_player_healing.gd then /story-done production/epics/health-damage-system/story-004-player-healing.md
+
+## Session Extract — /story-done 2026-06-02 (health-damage story-005)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/health-damage-system/story-005-boss-hp-phases-defeat.md — Boss HP, Phase Detection, and Defeat
+- Tech debt logged: None (advisory deviations in completion notes only)
+- Next recommended: Story 004 (Player Healing) or Story 006 (HUD Segment Formula) — both independent; Story 007 (retry reset) now unlocked
+
+## Session Extract — /dev-story 2026-06-02 (health-damage story-005)
+- Story: production/epics/health-damage-system/story-005-boss-hp-phases-defeat.md — Boss HP, Phase Detection, and Defeat
+- Files changed: game/scripts/core/health_damage_system.gd (modified — _is_boss_defeated, _entered_phases, BOSS branch in apply_damage, _check_phase_transitions()), game/tests/helpers/mock_event_bus.gd (modified — boss tracking fields/callbacks additive), game/tests/unit/health_damage/test_boss_hp_phases.gd (new, 18 test functions), game/tests/unit/health_damage/test_hp_initialization.gd (modified — phase starts at 1)
+- Test written: game/tests/unit/health_damage/test_boss_hp_phases.gd (18/18 PASS; 126/131 total suite pass, 5 pre-existing pending)
+- Notes: current_boss_phase initializes to 1 (not 0) per AC-1/AC-3 requirements; _check_phase_transitions() iterates all thresholds in single pass for multi-threshold crossing
+- Blockers: None
+- Next: /code-review game/scripts/core/health_damage_system.gd game/tests/unit/health_damage/test_boss_hp_phases.gd then /story-done production/epics/health-damage-system/story-005-boss-hp-phases-defeat.md
+
+## Session Extract — /story-done 2026-06-02 (bossdata story-003)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/bossdata-resource-architecture/story-003-mvp-boss-asset.md — MVP Boss Data Asset + GUT Factory Proof
+- Tech debt logged: None
+- Next recommended: BossData Resource Architecture epic complete — all 3 stories Done; Core and Feature epics unlocked
+
+## Session Extract — /story-done 2026-06-02 (bossdata story-002)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/bossdata-resource-architecture/story-002-boss-data-loader.md — BossDataLoader — Load and Validate
+- Tech debt logged: None (advisory deviations documented in story completion notes only)
+- Next recommended: bossdata story-003 (MVP Boss Asset — boss_01.tres)
+
+## Session Extract — /dev-story 2026-06-02 (bossdata story-002)
+- Story: production/epics/bossdata-resource-architecture/story-002-boss-data-loader.md — BossDataLoader — Load and Validate
+- Files changed: game/scripts/foundation/boss_data_loader.gd (new), game/tests/unit/bossdata-resource-architecture/test_boss_data_loader.gd (new)
+- Test written: game/tests/unit/bossdata-resource-architecture/test_boss_data_loader.gd (13 test functions)
+- Blockers: None. Assert-crash tests (AC-2 empty attack_sequence, AC-5 non-descending threshold) marked pending() — GDScript assert() cannot be caught in GUT runner
+- Next: /code-review game/scripts/foundation/boss_data_loader.gd game/tests/unit/bossdata-resource-architecture/test_boss_data_loader.gd then /story-done production/epics/bossdata-resource-architecture/story-002-boss-data-loader.md
+
+## Session Extract — /story-done 2026-06-02 (bossdata story-001)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/bossdata-resource-architecture/story-001-bossdata-resources.md — BossData Resource Class Hierarchy
+- Tech debt logged: None (class-cache CI requirement noted in story Completion Notes + memory)
+- Next recommended: bossdata story-002 (BossDataLoader — Load and Validate)
+
+## Session Extract — /dev-story 2026-06-02 (bossdata story-001)
+- Story: production/epics/bossdata-resource-architecture/story-001-bossdata-resources.md — BossData Resource Class Hierarchy
+- Files changed: game/scripts/data/attack_data.gd, game/scripts/data/phase_data.gd, game/scripts/data/boss_data.gd, game/tests/unit/bossdata-resource-architecture/test_bossdata_resources.gd
+- Test written: game/tests/unit/bossdata-resource-architecture/test_bossdata_resources.gd (15 test functions) — 15/15 PASS
+- Full suite: 4 scripts, 55 tests, all pass
+- KEY LEARNING: new class_name scripts need a class-cache regen before headless GUT sees them. Run once after adding class_name files:
+  `C:\game\godot\Godot_v4.6.2-stable_win64_console.exe --headless --editor --quit --path C:\game\comeon\game`
+  CI MUST do this import step before running GUT. See memory feedback-gut-file-naming.
+- Blockers: None
+- Next: /story-done bossdata story-001
+
+## Session Extract — /story-done 2026-06-02 (Story 003)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/signal-infrastructure/story-003-event-bus-injection-test.md — EventBus GUT Testability — Mock Injection Validation
+- Tech debt logged: None
+- Next recommended: signal-infrastructure epic 全部 Complete — 开始 bossdata-resource-architecture epic
+
+## Session Extract — /dev-story 2026-06-02 (Story 003)
+- Story: production/epics/signal-infrastructure/story-003-event-bus-injection-test.md — EventBus GUT Testability — Mock Injection Validation
+- Files changed: game/tests/helpers/mock_event_bus.gd (created), game/tests/integration/signal-infrastructure/test_event_bus_injection.gd (created)
+- Test written: game/tests/integration/signal-infrastructure/test_event_bus_injection.gd (5 test functions)
+- Blockers: None
+- Next: run GUT integration tests, then /story-done production/epics/signal-infrastructure/story-003-event-bus-injection-test.md
+
+## Session Extract — /story-done 2026-06-02 (Story 002)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/signal-infrastructure/story-002-event-bus-signals.md — EventBus Autoload — Typed Signal Declarations
+- Tech debt logged: None
+- Next recommended: story-003-event-bus-injection-test.md (Signal Infrastructure epic)
+
+## Session Extract — /dev-story 2026-06-02 (Story 002)
+- Story: production/epics/signal-infrastructure/story-002-event-bus-signals.md — EventBus Autoload — Typed Signal Declarations
+- Files changed: game/autoloads/event_bus.gd (created), game/project.godot (autoload section added), game/tests/unit/signal-infrastructure/test_event_bus.gd (created)
+- Test written: game/tests/unit/signal-infrastructure/test_event_bus.gd (15 test functions)
+- Blockers: None
+- Next: run GUT tests, then /story-done production/epics/signal-infrastructure/story-002-event-bus-signals.md
+
+## Session Extract — /story-done 2026-06-02
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/signal-infrastructure/story-001-game-enums.md — GameEnums — Shared Enum Definitions
+- Tech debt logged: None
+- Next recommended: story-002-event-bus-signals.md (Signal Infrastructure epic)
+
+## Session Extract — /dev-story 2026-06-02
+- Story: production/epics/signal-infrastructure/story-001-game-enums.md — GameEnums — Shared Enum Definitions
+- Files changed: game/scripts/data/game_enums.gd (created), game/tests/unit/signal-infrastructure/game_enums_test.gd (created), game/project.godot (created)
+- Test written: tests/unit/signal-infrastructure/game_enums_test.gd (22 test functions)
+- Blockers: None
+- Next: /code-review scripts/data/game_enums.gd tests/unit/signal-infrastructure/game_enums_test.gd then /story-done production/epics/signal-infrastructure/story-001-game-enums.md
 
 ## /create-epics layer:foundation 完成（2026-06-02）
 3 个 Foundation epic 写入 production/epics/：
