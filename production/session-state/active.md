@@ -383,3 +383,9 @@ From instant-retry-system.md (Art Bible 7.5 同步后):
 - Known warning: "8 unfreed children" — test_time_scale_set_to_zero_on_trigger의 999s timer가 lingering; 기능 문제 없음
 - Blockers: None (AC-timing 등 수동 검증은 /story-done에서 처리)
 - Next: /code-review game/autoloads/hitpause_manager.gd game/tests/unit/hitpause/hitpause_manager_test.gd then /story-done production/epics/retry-context/story-002-hitpause-manager-autoload.md
+
+## Session Extract — /story-done 2026-06-03 (retry-context story-002)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/retry-context/story-002-hitpause-manager-autoload.md — HitpauseManager Autoload + Runtime Verification
+- Tech debt logged: 2 items (trigger_hitpause 음수 방어, GUT 경고) → docs/tech-debt-register.md
+- Next recommended: retry-context epic 완료 — 다음 에픽으로 이동

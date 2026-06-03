@@ -1,7 +1,7 @@
 # Story 002: HitpauseManager Autoload + Runtime Verification
 
 > **Epic**: Retry Context & Hitpause Infrastructure
-> **Status**: Ready
+> **Status**: Complete
 > **Layer**: Foundation
 > **Type**: Logic
 > **Estimate**: 2–3 hours
@@ -146,3 +146,12 @@ No special handling needed in HitpauseManager itself. The independence of the tw
 
 - Depends on: Story 001 (RetryContext) must be Done — Autoload registration order requires RetryContext registered first
 - Unlocks: All combat system epics that call `HitpauseManager.trigger_hitpause()` (health-damage, parry-telegraph, counter-attack-combo)
+
+---
+
+## Completion Notes
+**Completed**: 2026-06-03
+**Criteria**: 6/6 passing (AC-timing, AC-timer-verify, AC-independence: 수동 런타임 확인 완료)
+**Deviations**: 2 Advisory — logged to tech-debt-register.md
+**Test Evidence**: Logic — `game/tests/unit/hitpause/hitpause_manager_test.gd` 4/7 automated pass + 3 manual verified (0.512s)
+**Code Review**: Complete — CHANGES REQUIRED (주석 수정) → 수정 후 APPROVED WITH SUGGESTIONS
