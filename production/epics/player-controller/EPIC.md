@@ -59,6 +59,17 @@ This epic is complete when:
 - All input references use StringName action names (`&"parry"`, `&"jump"`, etc.)
 - `reset_for_retry(ctx)` implementation verified by integration test (retry flow)
 
+## Stories
+
+| # | Story | Type | Status | ADR |
+|---|-------|------|--------|-----|
+| 001 | [PlayerController Skeleton — CharacterBody2D + State Machine + Movement Physics](story-001-pc-skeleton.md) | Logic | Complete | ADR-0004, ADR-0001 |
+| 002 | [Jump System — Coyote Time + Jump Buffer](story-002-pc-jump.md) | Logic | Complete | ADR-0004 |
+| 003 | [Parry Signal Contract — parry_input_pressed + exit_parry_state](story-003-pc-parry.md) | Integration | Ready | ADR-0004, ADR-0001 |
+| 004 | [HIT_STUN + DEAD State — Damage Response](story-004-pc-hit-stun.md) | Integration | Ready | ADR-0004, ADR-0003 |
+| 005 | [Dodge Signal Contract — dodge_input_pressed + Physics Pause](story-005-pc-dodge.md) | Integration | Ready | ADR-0004, ADR-0001 |
+| 006 | [Attack Input Forwarding + Retry Reset](story-006-pc-attack-retry.md) | Integration | Ready | ADR-0004, ADR-0003 |
+
 ## Next Step
 
-Run `/create-stories player-controller` to break this epic into implementable stories.
+Run `/story-readiness production/epics/player-controller/story-001-pc-skeleton.md` then `/dev-story` to begin implementation. Work stories in order — each story's `Depends on:` field tells you what must be DONE first.

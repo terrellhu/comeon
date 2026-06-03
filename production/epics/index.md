@@ -16,7 +16,7 @@ Engine: Godot 4.6
 | Epic | Layer | System | GDD | Stories | Status |
 |------|-------|--------|-----|---------|--------|
 | [health-damage-system](health-damage-system/EPIC.md) | Core | HealthDamageSystem | health-damage-system.md | 7 stories | Ready |
-| [player-controller](player-controller/EPIC.md) | Core | PlayerController | player-controller-system.md | Not yet created | Ready |
+| [player-controller](player-controller/EPIC.md) | Core | PlayerController | player-controller-system.md | 6 stories | Ready |
 
 ## Feature Layer
 
