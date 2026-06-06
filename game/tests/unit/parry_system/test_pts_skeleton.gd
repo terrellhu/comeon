@@ -60,14 +60,18 @@ func test_pts_attack_telegraphed_heavy_transitions_to_telegraphing() -> void:
 # ─── AC-13 partial: per-frame timer advance and signal emission ───────────────
 
 func test_pts_physics_process_advances_timer_and_emits_signal_each_frame() -> void:
+	# Arrange: put system into TELEGRAPHING (precondition for _physics_process to run).
 	_mock_bus.attack_telegraphed.emit(GameEnums.AttackType.HEAVY, 25.0)
 	assert_eq(_pts.system_state, _PTS_SCRIPT.ParryState.TELEGRAPHING, "precondition: TELEGRAPHING")
+	# watch_signals MUST come before the actions that emit the watched signal.
 	watch_signals(_mock_bus)
 
+	# Act: three physics frames of 0.05s each.
 	_pts._physics_process(0.05)
 	_pts._physics_process(0.05)
 	_pts._physics_process(0.05)
 
+	# Assert: signal count and timer value.
 	assert_signal_emit_count(
 		_mock_bus,
 		"telegraph_updated",

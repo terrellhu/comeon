@@ -1,7 +1,7 @@
 # Story 002: Window Timing Formula + AttackData Override Lookup
 
 > **Epic**: ParryTelegraphSystem
-> **Status**: Not Started
+> **Status**: Complete
 > **Layer**: Feature
 > **Type**: Logic
 > **Estimate**: M
@@ -59,7 +59,14 @@
 
 ## Definition of Done
 
-- [ ] All ACs pass in GUT headless (0 failing)
-- [ ] `_get_effective_telegraph_duration(attack_data)` and `_compute_window_times()` implemented
-- [ ] `/code-review` APPROVED
-- [ ] `/story-done` run and Status → Complete
+- [x] All ACs pass in GUT headless (0 failing)
+- [x] `_get_effective_telegraph_duration(attack_data)` and `_compute_window_times()` implemented
+- [x] `/code-review` APPROVED
+- [x] `/story-done` run and Status → Complete
+
+## Completion Notes
+**Completed**: 2026-06-06
+**Criteria**: 4/4 passing
+**Deviations**: None
+**Test Evidence**: Logic — `game/tests/unit/parry_system/test_pts_window_timing.gd` (16/16 PASS)
+**Code Review**: Complete — APPROVED after CR-1 (null guard early-return) + CR-2 (assert→push_warning+clamp) fixes applied

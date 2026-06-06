@@ -1,7 +1,7 @@
 # Story 001: ParryTelegraphSystem Skeleton
 
 > **Epic**: ParryTelegraphSystem
-> **Status**: In Progress
+> **Status**: Complete
 > **Layer**: Feature
 > **Type**: Logic
 > **Estimate**: M
@@ -59,6 +59,13 @@
 - Path A success (Story 003)
 - Path B/C failure (Story 004)
 - reset_for_retry, player_died/boss_defeated guards (Story 005)
+
+## Completion Notes
+**Completed**: 2026-06-06
+**Criteria**: 4/4 passing
+**Deviations**: 0.8/1.2/1.5 consts in const block only (not logic) — compliant; window_open=false and _DEFAULT_DURATION_* are by-design placeholders for Story 002
+**Test Evidence**: Logic — `game/tests/unit/parry_system/test_pts_skeleton.gd` 5/5 PASS
+**Code Review**: APPROVED (B-1 divide-by-zero guard + W-2 null assert added)
 
 ## Definition of Done
 
