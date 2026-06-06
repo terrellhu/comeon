@@ -59,42 +59,38 @@ func after_each() -> void:
 
 # ─── Signal emission: _enter_state(DODGING) via _transition_to ────────────────
 
-func test_dodge_entering_dodging_from_idle_emits_signal_right() -> void:
-	# AC-dodge-idle: entering DODGING from IDLE emits dodge_input_pressed.
-	# Note: direction value verification (facing_direction=1 → dir=1) requires real
-	# Input injection — deferred to test_pc_dodge_physics.gd (pending stub below).
-	# Here we verify the signal is declared and emittable from the controller.
-	# Arrange (player starts at IDLE by default)
+func test_dodge_signal_declared_and_emittable_right() -> void:
+	# Verifies the signal is declared on PlayerController and can carry direction=1.
+	# NOTE: this does NOT test the production code path — _handle_input() emits
+	# dodge_input_pressed in the dodge branch, but Input.is_action_just_pressed()
+	# always returns false in GUT headless. Full AC-dodge-idle coverage (state=DODGING
+	# AND dodge_input_pressed(facing_direction) emitted in the same frame) is deferred
+	# to test_pc_dodge_physics.gd via Input injection.
 	_pc.facing_direction = 1
 	watch_signals(_pc)
-	# Act: simulate what _handle_input() would do when dodge is pressed
 	_pc._transition_to(GameEnums.PlayerState.DODGING)
 	_pc.dodge_input_pressed.emit(1)
-	# Assert
 	assert_eq(
 		_pc.player_state,
 		GameEnums.PlayerState.DODGING,
-		"State must be DODGING after transition (AC-dodge-idle)"
+		"State must be DODGING after transition"
 	)
 	assert_signal_emitted(
 		_pc, "dodge_input_pressed",
-		"dodge_input_pressed must be emitted when entering DODGING (AC-dodge-idle)"
+		"dodge_input_pressed signal must be declared and emittable on PlayerController"
 	)
 
 
-func test_dodge_entering_dodging_emits_signal_left() -> void:
-	# AC-dodge-idle edge: facing_direction = -1 — signal is emittable with direction arg.
-	# Direction value test deferred to physics integration test.
-	# Arrange (player starts at IDLE by default)
+func test_dodge_signal_declared_and_emittable_left() -> void:
+	# Same as above for direction=-1.
+	# Production code path coverage deferred to test_pc_dodge_physics.gd.
 	_pc.facing_direction = -1
 	watch_signals(_pc)
-	# Act
 	_pc._transition_to(GameEnums.PlayerState.DODGING)
 	_pc.dodge_input_pressed.emit(-1)
-	# Assert
 	assert_signal_emitted(
 		_pc, "dodge_input_pressed",
-		"dodge_input_pressed must be emittable with direction=-1 (AC-dodge-idle edge)"
+		"dodge_input_pressed signal must carry direction=-1 when emitted"
 	)
 
 
@@ -167,7 +163,7 @@ func test_dodge_ended_transitions_to_idle_when_no_move_input() -> void:
 	)
 
 
-func test_dodge_ended_guard_prevents_transition_when_not_dodging() -> void:
+func test_dodge_ended_guard_prevents_transition_from_dead() -> void:
 	# AC-dead-overrides-dodge edge: if player is already DEAD, _on_dodge_ended() must do nothing.
 	# Arrange
 	_pc._transition_to(GameEnums.PlayerState.DEAD)
@@ -372,5 +368,16 @@ func test_ac_dodge_running_via_input_pending() -> void:
 		"Integration test must assert: " +
 		"(1) state = DODGING, (2) dodge_input_pressed(move_input_direction) emitted, " +
 		"(3) dodge_dir uses move axis direction, not facing_direction. " +
+		"Deferred to: " + INTEGRATION_FILE
+	)
+
+
+func test_ac_dodge_ended_running_resume_via_input_pending() -> void:
+	pending(
+		"AC-dodge-ended RUNNING branch: _on_dodge_ended() when move input is held must " +
+		"transition to RUNNING (not IDLE). In GUT headless Input.get_axis() always " +
+		"returns 0, making the RUNNING branch unreachable without Input injection. " +
+		"Integration test must assert: " +
+		"(1) hold move_right during dodge, (2) dodge_ended fires, (3) state = RUNNING. " +
 		"Deferred to: " + INTEGRATION_FILE
 	)

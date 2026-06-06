@@ -1,8 +1,8 @@
 # Control Manifest
 
 > **Engine**: Godot 4.6
-> **Last Updated**: 2026-06-01
-> **Manifest Version**: 2026-06-01
+> **Last Updated**: 2026-06-06
+> **Manifest Version**: 2026-06-06
 > **ADRs Covered**: ADR-0001, ADR-0002, ADR-0003, ADR-0004, ADR-0005
 > **Status**: Active — regenerate with `/create-control-manifest update` when ADRs change
 
@@ -47,6 +47,8 @@ GameEnums — any Autoload or shared data module*
   Validation rules: assert `attack_sequence.size() > 0`; assert
   `idle_duration_after_attack > 0` (clamp to 0.1s + warning if <0.1s);
   clamp `telegraph_duration_override < 0.1s` to 0.1s + warning;
+  clamp `window_width_override < 0.05s` to 0.05s + warning;
+  clamp `stagger_duration_override < 0.05s` to 0.05s + warning;
   assert `phase_threshold_pct` is descending. — source: ADR-0002
 
 - **GUT tests must inject BossData via `BossData.new()` in code** — never depend
@@ -239,12 +241,11 @@ InstantRetrySystem*
   `if _active: return` at the top of `trigger_hitpause()`. The first hitpause
   request wins; nested requests are silently dropped. — source: ADR-0005
 
-- **Use `Input.is_anything_pressed()` inside a `PROCESS_MODE_ALWAYS` `_process`**
-  for death-screen skip detection. Start listening only after RED_FLASH ends (200ms
-  into the sequence) to prevent residual death-frame input from triggering skip.
-  *(Note: GDD AC-03 and ADR-0003 are in conflict on this 200ms guard — see CONFLICT-01
-  in architecture-review-2026-06-01.md. Implement the 200ms guard per ADR-0003 until
-  resolved.)* — source: ADR-0003
+- **Use `_unhandled_input(event)` with `PROCESS_MODE_ALWAYS` for death-screen skip
+  detection**: check `event.is_pressed() and not event.is_echo()` to respond only
+  to fresh key/button presses, not held inputs. Skip detection is active during all
+  death-screen states including RED_FLASH — no 200ms delay required.
+  *(CONFLICT-01 resolved — S002-I01 2026-06-06)* — source: ADR-0003
 
 ### Forbidden Approaches
 
@@ -399,7 +400,6 @@ intentionally excluded from the manifest until resolved:
 
 | Item | Unresolved question | Source |
 |------|---------------------|--------|
-| Parry timing overrides (window_open_fraction, window_width, stagger_duration) | Global @export on ParryTelegraphSystem vs per-attack override in AttackData | TR-PTS-011 / CONFLICT-01 |
 | Counter combo tuning (counter_base_damage, multiplier[], bonus_ratio, hit_animation_duration) | Global @export on CounterAttackComboSystem vs a ComboTuning Resource | TR-CAC-002/003/006 |
 | HUD counter-bar world-coordinate tracking | CanvasLayer screen-transform vs Node2D world-layer rendering | TR-HUD-008 |
 
@@ -407,3 +407,10 @@ intentionally excluded from the manifest until resolved:
 system. This is the safe fallback — it satisfies "no literals in code" without
 requiring a new Resource schema. Override this default via ADR or control-manifest
 update when the design decision is made.
+
+### Resolved Items
+
+| Item | Resolution | Date |
+|------|-----------|------|
+| CONFLICT-01: ADR-0003 200ms skip guard vs GDD AC-03 任意帧跳过 | 改用 `_unhandled_input(event)` + `event.is_pressed() and not event.is_echo()`；无需 200ms 延迟 | 2026-06-06 |
+| GAP-02: Parry timing overrides (window_open_fraction, window_width, stagger_duration) | 加入 AttackData 作为 per-attack override 字段（≤0 回退 GDD 默认值）；ADR-0002 已更新 | 2026-06-06 |

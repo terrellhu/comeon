@@ -1,0 +1,1 @@
+- [Foundation + Core Sprint QA Outcome](project_sprint_foundation_core.md) — 21 stories PASS, APPROVED WITH CONDITIONS, 4 deferred items to clear before Pre-Production gate

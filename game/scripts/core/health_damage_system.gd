@@ -10,6 +10,7 @@ extends Node
 ## Story 002: Player damage application and invulnerability window.
 ## Story 003: Player death detection and HP clamping.
 ## Story 005: Boss HP deduction, phase detection, and defeat emission.
+## Story 007: Retry reset contract (reset_for_retry).
 ##
 ## [b]Usage (production):[/b]
 ## [codeblock]
@@ -23,10 +24,10 @@ extends Node
 ## health_damage_system.init_battle(_make_test_boss())
 ## [/codeblock]
 ##
-## [b]Source:[/b] ADR-0001, ADR-0002, TR-HDS-001, TR-HDS-002, TR-HDS-003,
-## TR-HDS-004, TR-HDS-005, TR-HDS-006, TR-HDS-009, TR-HDS-010, TR-HDS-011,
+## [b]Source:[/b] ADR-0001, ADR-0002, ADR-0003, TR-HDS-001, TR-HDS-002, TR-HDS-003,
+## TR-HDS-004, TR-HDS-005, TR-HDS-006, TR-HDS-007, TR-HDS-009, TR-HDS-010, TR-HDS-011,
 ## TR-HDS-013, TR-HDS-014, TR-HDS-015,
-## Story 001, Story 002, Story 003, Story 004, Story 005
+## Story 001, Story 002, Story 003, Story 004, Story 005, Story 007
 
 # ---------------------------------------------------------------------------
 # Export vars — player-side tuning knobs (no gameplay literals in logic)
@@ -220,6 +221,41 @@ func apply_healing(target: GameEnums.Target, amount: float) -> void:
 		_event_bus.player_hp_changed.emit(current_player_hp, player_max_hp)
 	else:
 		push_warning("apply_healing: BOSS healing not implemented in MVP — ignoring")
+
+# ---------------------------------------------------------------------------
+# Public — retry reset API (Story 007)
+# ---------------------------------------------------------------------------
+
+## Resets HealthDamageSystem to a consistent post-death-screen state.
+##
+## Called by InstantRetrySystem after RetryContext.save_context() has captured
+## the Boss HP and phase. Restores player to full HP, preserves Boss HP from
+## [param ctx], clears the invulnerability timer, and resets the defeat flag.
+##
+## State variable contract (see ADR-0003):
+## - [member current_player_hp] → restored to [member player_max_hp]
+## - [member current_boss_hp] → set from [code]ctx["boss_hp"][/code]
+## - [member _invuln_timer] → cleared to 0.0
+## - [member _is_boss_defeated] → cleared to false (defensive — boss was alive at player death)
+## - [member _entered_phases] → intentionally NOT cleared: phase transitions up to
+##   the preserved phase already fired; clearing would cause boss_phase_changed to
+##   re-emit on the next hit, corrupting BossStateMachine state.
+## - [member current_boss_phase] → intentionally NOT written: already correct because
+##   _entered_phases is preserved; modifying it here would require reading ctx["boss_phase"]
+##   and could produce inconsistency with _entered_phases. BossStateMachine sets its own
+##   phase from ctx["boss_phase"] in its reset_for_retry call.
+##
+## Must complete synchronously; must not depend on _process or signals.
+## Called while SceneTree.paused = true.
+##
+## [b]Source:[/b] TR-HDS-007, ADR-0003, Story 007
+func reset_for_retry(ctx: Dictionary) -> void:
+	assert(ctx.has("boss_hp"), "reset_for_retry: ctx must contain 'boss_hp' — use RetryContext.load_context()")
+	current_player_hp = player_max_hp
+	current_boss_hp = ctx.get("boss_hp", 0.0) as float
+	_invuln_timer = 0.0
+	_is_boss_defeated = false
+	# _entered_phases: intentionally preserved — see doc comment above
 
 # ---------------------------------------------------------------------------
 # Public — inspection helpers

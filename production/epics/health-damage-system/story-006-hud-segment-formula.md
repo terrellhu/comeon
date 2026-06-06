@@ -68,7 +68,21 @@ func get_displayed_segments() -> int:
 
 ## QA Test Cases
 
-*QL-STORY-READY skipped — Lean mode. Run `/qa-plan health-damage-system` to generate full test specifications.*
+**Test file**: `game/tests/unit/health_damage/test_hud_segments.gd` — 5/5 PASS (2026-06-02)
+
+**GDD formula**: F-04 `displayed_segments = (current_player_hp ≤ 0) ? 0 : ceil(current_player_hp / hp_per_segment)`
+where `hp_per_segment = player_max_hp / player_hp_segments` (100 / 5 = 20.0)
+
+| current_player_hp | Formula | Expected |
+|-------------------|---------|----------|
+| 100.0 | ceil(100/20) = ceil(5.0) | **5** (full bar) |
+| 61.0 | ceil(61/20) = ceil(3.05) | **4** (above integer boundary) |
+| 60.0 | ceil(60/20) = ceil(3.0) | **3** (exact boundary drops segment) |
+| 1.0 | ceil(1/20) = ceil(0.05) | **1** (trace HP shows 1) |
+| 0.0 | special-case guard | **0** (not ceil(0) coincidence — explicit branch) |
+
+- **Edge cases**: `hp` slightly above boundary (e.g. 60.001) → 4; `hp < 0` → 0 (treat as dead)
+- **Design rationale**: `ceil()` chosen over `floor()` to avoid "feels dead" when player has HP remaining
 
 ---
 

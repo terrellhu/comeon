@@ -1,12 +1,12 @@
 # Story 005: Dodge Signal Contract — dodge_input_pressed + Physics Pause
 
 > **Epic**: PlayerController
-> **Status**: Ready
+> **Status**: Complete
 > **Layer**: Core
 > **Type**: Integration
 > **Estimate**: 2-3 hours
 > **Manifest Version**: 2026-06-01
-> **Last Updated**: 2026-06-03
+> **Last Updated**: 2026-06-03 (Completed)
 
 ## Context
 
@@ -158,7 +158,7 @@ The guard `if player_state == DODGING` prevents `dodge_ended` from firing if the
 
 *Note: GUT requires `test_` prefix.*
 
-**Status**: [ ] Not yet created
+**Status**: [x] `game/tests/integration/player_controller/test_pc_dodge.gd` — 19/22 pass, 3 pending (Input-injection deferrals documented)
 
 ---
 
@@ -166,3 +166,13 @@ The guard `if player_state == DODGING` prevents `dodge_ended` from firing if the
 
 - Depends on: Story 001 (PlayerController Skeleton) must be DONE
 - Unlocks: None directly (dodge contract consumed by DodgeSystem epic, future sprint)
+
+---
+
+## Completion Notes
+**Completed**: 2026-06-03
+**Criteria**: 5/6 verified (3 COVERED, 2 PARTIAL-deferred, 1 PENDING-deferred — all Input-injection deferrals documented with pending stubs pointing to `test_pc_dodge_physics.gd`)
+**Deviations**: ADVISORY — ADR-0004 drift: `dodge_input_pressed` emitted in `_handle_input()` with computed `dodge_dir` (not in `_enter_state()` with `facing_direction`). Justified by AC-dodge-running. Story 005 Implementation Notes serve as documentation. ADR-0004 example should be updated in future maintenance.
+**Test Evidence**: Integration test at `game/tests/integration/player_controller/test_pc_dodge.gd` — 19/22 pass, 3 pending
+**Code Review**: Complete — APPROVED WITH SUGGESTIONS; Required Changes (float `<= 0.0` timer comparisons, fake-coverage test rename + pending stub additions) applied before close.
+**Out-of-scope pre-landing**: Story 006 work landed early (`reset_for_retry()` fully implemented, `test_pc_attack_retry.gd` created, `attack_input_pressed.emit()` uncommented). Story 006 may be closeable without further coding.

@@ -1,6 +1,6 @@
 # Epics Index
 
-Last Updated: 2026-06-02 (Core layer added)
+Last Updated: 2026-06-04 (Feature layer added)
 Engine: Godot 4.6
 
 ## Foundation Layer
@@ -20,13 +20,31 @@ Engine: Godot 4.6
 
 ## Feature Layer
 
-*Not yet created — run `/create-epics layer:feature` when Core is nearly complete.*
+| Epic | Layer | System | GDD | Stories | Status |
+|---|---|---|---|---|---|
+| [boss-state-machine](boss-state-machine/EPIC.md) | Feature | BossStateMachine | boss-state-machine.md | 5 stories | Ready ✅ |
+| [parry-telegraph-system](parry-telegraph-system/EPIC.md) | Feature | ParryTelegraphSystem | parry-telegraph-system.md | TBD — run `/create-stories parry-telegraph-system` | Ready ⚠️ GAP-02 |
+| [counter-attack-combo](counter-attack-combo/EPIC.md) | Feature | CounterAttackComboSystem | counter-attack-combo.md | TBD — run `/create-stories counter-attack-combo` | Ready ⚠️ GAP-02 |
+| [instant-retry-system](instant-retry-system/EPIC.md) | Feature | InstantRetrySystem | instant-retry-system.md | TBD — run `/create-stories instant-retry-system` | ❌ BLOCKED (CONFLICT-01) |
 
 ## Presentation Layer
 
-*Not yet created — run `/create-epics layer:presentation` when Feature is nearly complete.*
+| Epic | Layer | System | GDD | Stories | Status |
+|---|---|---|---|---|---|
+| hud-system | Presentation | HUDSystem | hud-system.md | TBD — run `/create-epics layer:presentation` | Not yet created |
 
 ---
+
+## Implementation Order (Sprint 002)
+
+Dependency-safe order for Feature layer:
+
+1. **Resolve CONFLICT-01** (S002-I01) → unblocks instant-retry-system
+2. **Resolve GAP-02** (S002-I02) → unblocks parry-telegraph-system and counter-attack-combo parameter stories
+3. **boss-state-machine** — no blockers (ADR-0001/0002/0004/0005 all Accepted, 12/12 TRs covered)
+4. **parry-telegraph-system** — after GAP-02
+5. **counter-attack-combo** — after parry-telegraph-system
+6. **instant-retry-system** — after CONFLICT-01 + all other Feature systems
 
 ## Implementation Order (Foundation)
 

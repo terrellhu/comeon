@@ -70,7 +70,18 @@
 
 ## QA Test Cases
 
-*QL-STORY-READY skipped — Lean mode. Run `/qa-plan health-damage-system` to generate full test specifications.*
+**Test file**: `game/tests/unit/health_damage/test_player_damage_invuln.gd` — 15/15 PASS (2026-06-02)
+
+**GDD formula**: F-01 `player_damage_intake = attack_base_damage` (pass-through); invuln window rule
+
+- **Basic damage**: `apply_damage(PLAYER, 25.0)` with hp=100 → `current_player_hp = 75.0`; `player_hp_changed(75.0, 100.0)` emitted
+- **Zero damage no-op**: `apply_damage(PLAYER, 0.0)` → HP unchanged; no signal; invuln not consumed
+- **Negative damage no-op**: `apply_damage(PLAYER, -5.0)` → HP unchanged; no signal
+- **Invuln window opened**: After valid damage, `invuln_timer > 0.0`
+- **Invuln blocks re-hit**: Second `apply_damage` during window → HP unchanged
+- **Invuln timer not reset on re-hit**: Timer continues counting down from original value
+- **Clamping**: Damage > current_player_hp → `current_player_hp = 0.0`; `player_died` emitted; no negative HP
+- **Edge cases** (GDD): Single damage ≥ current HP triggers death same-frame with no buffer
 
 ---
 

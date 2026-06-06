@@ -67,7 +67,16 @@
 
 ## QA Test Cases
 
-*QL-STORY-READY skipped — Lean mode. Run `/qa-plan health-damage-system` to generate full test specifications.*
+**Test file**: `game/tests/unit/health_damage/test_player_death.gd` — 10/10 PASS (2026-06-02)
+
+**GDD rule**: `current_player_hp ≤ 0` → clamp to 0, emit `player_died` same-frame, no buffer
+
+- **Fatal damage emits player_died once**: `apply_damage(PLAYER, 100.0)` with hp=100 → `player_died` emitted exactly 1 time; `current_player_hp == 0.0`
+- **HP clamped to 0, not negative**: After fatal damage, `current_player_hp == 0.0` (not −X)
+- **No re-emit after death**: Second `apply_damage` after death during invuln → `player_died` not emitted again
+- **Zero-damage after death is silent**: `apply_damage(PLAYER, 0.0)` post-death → no signal, no crash
+- **Same-frame death**: `player_died` emitted in same call as `apply_damage` (no deferred frame)
+- **Edge cases** (GDD): `apply_damage` with invuln active post-death → ignored (invuln window may still be running)
 
 ---
 

@@ -205,10 +205,10 @@ func _enter_state(state: GameEnums.PlayerState) -> void:
 func _exit_state(state: GameEnums.PlayerState) -> void:
 	match state:
 		GameEnums.PlayerState.IDLE:
-			if not _jumped_this_frame and _coyote_timer == 0.0:
+			if not _jumped_this_frame and _coyote_timer <= 0.0:
 				_coyote_timer = coyote_time_duration
 		GameEnums.PlayerState.RUNNING:
-			if not _jumped_this_frame and _coyote_timer == 0.0:
+			if not _jumped_this_frame and _coyote_timer <= 0.0:
 				_coyote_timer = coyote_time_duration
 		GameEnums.PlayerState.AIRBORNE:
 			pass
@@ -327,7 +327,7 @@ func _process_state(delta: float) -> void:
 			velocity.x = 0.0
 			if _parry_exit_timer > 0.0:
 				_parry_exit_timer = maxf(0.0, _parry_exit_timer - delta)
-				if _parry_exit_timer == 0.0:
+				if _parry_exit_timer <= 0.0:
 					# Transition to RUNNING if move input held, else IDLE.
 					var move_dir: int = int(Input.get_axis(&"move_left", &"move_right"))
 					if move_dir != 0:
@@ -340,7 +340,7 @@ func _process_state(delta: float) -> void:
 			# can override it during the stun.
 			velocity.x = -float(facing_direction) * knockback_speed
 			_hit_stun_timer = maxf(0.0, _hit_stun_timer - delta)
-			if _hit_stun_timer == 0.0:
+			if _hit_stun_timer <= 0.0:
 				var move_dir: int = int(Input.get_axis(&"move_left", &"move_right"))
 				if move_dir != 0:
 					_transition_to(GameEnums.PlayerState.RUNNING)

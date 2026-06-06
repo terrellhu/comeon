@@ -66,7 +66,15 @@
 
 ## QA Test Cases
 
-*QL-STORY-READY skipped — Lean mode. Run `/qa-plan health-damage-system` to generate full test specifications.*
+**Test file**: `game/tests/unit/health_damage/test_hp_initialization.gd` — 11/11 PASS (2026-06-02)
+
+**GDD formula**: HDS init contract — `current_player_hp == player_max_hp`, `current_boss_hp == boss_data.boss_max_hp`
+
+- **HP init from BossData**: `init_battle(boss_data)` → `current_player_hp = player_max_hp (100.0)`, `current_boss_hp = boss_data.boss_max_hp (1000.0)` — no hardcoded literals
+- **Non-standard boss HP**: `boss_data.boss_max_hp = 500.0` → `current_boss_hp = 500.0`
+- **No literals in logic**: grep `game/scripts/core/health_damage_system.gd` for `100`, `1000` — 0 matches in logic code
+- **hp_per_segment formula**: `hp_per_segment = player_max_hp / player_hp_segments` (100 / 5 = 20.0)
+- **Edge cases**: `init_battle` with null boss_data → assert or graceful guard (boundary behaviour documented in GDD Edge Cases)
 
 ---
 

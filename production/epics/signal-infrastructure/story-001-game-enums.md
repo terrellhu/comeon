@@ -98,7 +98,7 @@ enum PlayerState { IDLE, RUNNING, AIRBORNE, PARRYING, DODGING, HIT_STUN, DEAD }
 
 ## QA Test Cases
 
-*Test cases not yet defined — run /qa-plan to generate them.*
+**Test file**: `game/tests/unit/signal-infrastructure/test_game_enums.gd` — 22/22 PASS (2026-06-02)
 
 **AC-1**: `game/scripts/data/game_enums.gd` exists as a plain class with no inheritance
 - Given: project is freshly opened in Godot 4.6

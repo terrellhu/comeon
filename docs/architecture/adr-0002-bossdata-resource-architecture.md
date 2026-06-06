@@ -97,8 +97,13 @@ extends Resource
 @export var attack_type: GameEnums.AttackType = GameEnums.AttackType.LIGHT
 @export var damage: float = 10.0
 @export_range(0.0, 5.0) var telegraph_duration_override: float = 0.0
-# 0.0 = 使用 AttackType 全局默认值（LIGHT=0.8s, HEAVY=1.2s, SWEEP=1.5s）
-# >0.0 = 覆盖该攻击的预警时长
+# 0.0 = 使用 AttackType 全局默认值（LIGHT=0.8s, HEAVY=1.2s, SWEEP=1.5s）; >0 = 覆盖
+@export_range(0.0, 2.0) var window_width_override: float = 0.0
+# 0.0 = 使用类型默认值（LIGHT=0.30s, HEAVY=0.35s, SWEEP=0.45s）; >0 = 覆盖格挡窗口宽度
+@export_range(0.0, 1.0) var window_open_fraction_override: float = 0.0
+# 0.0 = 使用全局默认值（0.50）; >0 = 覆盖窗口开启时机（占预警时长的比例）
+@export_range(0.0, 10.0) var stagger_duration_override: float = 0.0
+# 0.0 = 使用类型默认值（LIGHT=1.0s, HEAVY=1.5s, SWEEP=2.0s）; >0 = 覆盖 Boss 硬直时长
 
 
 # scripts/data/phase_data.gd
@@ -148,6 +153,12 @@ func _validate(data: BossData) -> void:
                 push_warning("telegraph_duration_override < 0.1s clamped to 0.1s for attack %s"
                     % GameEnums.AttackType.keys()[attack.attack_type])
                 attack.telegraph_duration_override = 0.1
+            if attack.window_width_override > 0.0 and attack.window_width_override < 0.05:
+                push_warning("window_width_override < 0.05s clamped to 0.05s")
+                attack.window_width_override = 0.05
+            if attack.stagger_duration_override > 0.0 and attack.stagger_duration_override < 0.05:
+                push_warning("stagger_duration_override < 0.05s clamped to 0.05s")
+                attack.stagger_duration_override = 0.05
         assert(phase.idle_duration_after_attack > 0.0,
             "PhaseData.idle_duration_after_attack must be > 0")
         if phase.idle_duration_after_attack < 0.1:
@@ -232,7 +243,7 @@ func _make_test_boss() -> BossData:
 | boss-state-machine.md | TR-BSM-009: 加载时验证（空序列 assert / invalid override clamp / animation 缺失降级） | `BossDataLoader._validate()` |
 | boss-state-machine.md | TR-BSM-010: 代码中不含 BossData 字面量 | 所有字面量在 .tres 文件，代码通过 @export 变量读取 |
 | health-damage-system.md | TR-HDS-010: boss_max_hp + phase_threshold_pct[] 来自 BossData，不硬编码 | `BossData.boss_max_hp: float` + `BossData.phase_threshold_pct: Array[float]` |
-| parry-telegraph-system.md | TR-PTS-011: 所有时序值从 BossData 加载，不含字面量 | `AttackData.telegraph_duration_override` + `AttackType` enum for default lookup |
+| parry-telegraph-system.md | TR-PTS-011: 所有时序值从 BossData 加载，不含字面量 | `AttackData.telegraph_duration_override` + `window_width_override` + `window_open_fraction_override` + `stagger_duration_override`；ParryTelegraphSystem 读取 override 值，≤ 0 时回退到 GDD 默认常量 |
 | instant-retry-system.md | TR-IRS-002: 死亡屏幕 PHASE_SYMBOL 来自 Boss 数据资产 | `PhaseData.phase_symbol: Texture2D` |
 
 ---

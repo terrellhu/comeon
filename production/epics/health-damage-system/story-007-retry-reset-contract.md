@@ -1,12 +1,12 @@
 # Story 007: Retry Reset Contract
 
 > **Epic**: HealthDamageSystem
-> **Status**: Ready
+> **Status**: Complete
 > **Layer**: Core
 > **Type**: Integration
 > **Estimate**: M (2–3 hours)
 > **Manifest Version**: 2026-06-01
-> **Last Updated**: —
+> **Last Updated**: 2026-06-04
 
 ## Context
 
@@ -31,11 +31,11 @@
 
 *From GDD `design/gdd/health-damage-system.md`, scoped to this story:*
 
-- [ ] **GIVEN** player died when `current_boss_hp = 750.0`, ctx = `{"boss_hp": 750.0, "boss_phase": 1, "death_count": 1}`, **WHEN** `reset_for_retry(ctx)` called, **THEN** `current_player_hp == player_max_hp` (100.0) and `current_boss_hp == 750.0` (NOT reset to boss_max_hp)
-- [ ] **GIVEN** player was INVULNERABLE (`invuln_timer = 0.3`) at death, **WHEN** `reset_for_retry(ctx)` called, **THEN** `invuln_timer == 0.0` (residual invuln cleared)
-- [ ] **GIVEN** Phase 2 was entered (`entered_phases` contains phase index 1), **WHEN** `reset_for_retry(ctx)` called, **THEN** `entered_phases` still contains phase index 1 — `boss_phase_changed` NOT re-emitted on retry
-- [ ] **GIVEN** `_is_boss_defeated` was false at player death, **WHEN** `reset_for_retry(ctx)` called, **THEN** `_is_boss_defeated` stays false (reset does not change defeat flag if Boss was alive at death)
-- [ ] **GIVEN** full integration: `apply_damage(PLAYER, 100.0)` triggers `player_died` → RetryContext saves `{boss_hp: current_boss_hp, ...}` → `reset_for_retry(RetryContext.load_context())` called, **THEN** system is in a consistent state: player_hp = 100, boss_hp = preserved, entered_phases intact
+- [x] **GIVEN** player died when `current_boss_hp = 750.0`, ctx = `{"boss_hp": 750.0, "boss_phase": 1, "death_count": 1}`, **WHEN** `reset_for_retry(ctx)` called, **THEN** `current_player_hp == player_max_hp` (100.0) and `current_boss_hp == 750.0` (NOT reset to boss_max_hp)
+- [x] **GIVEN** player was INVULNERABLE (`invuln_timer = 0.3`) at death, **WHEN** `reset_for_retry(ctx)` called, **THEN** `invuln_timer == 0.0` (residual invuln cleared)
+- [x] **GIVEN** Phase 2 was entered (`entered_phases` contains phase index 1), **WHEN** `reset_for_retry(ctx)` called, **THEN** `entered_phases` still contains phase index 1 — `boss_phase_changed` NOT re-emitted on retry
+- [x] **GIVEN** `_is_boss_defeated` was false at player death, **WHEN** `reset_for_retry(ctx)` called, **THEN** `_is_boss_defeated` stays false (reset does not change defeat flag if Boss was alive at death)
+- [x] **GIVEN** full integration: `apply_damage(PLAYER, 100.0)` triggers `player_died` → RetryContext saves `{boss_hp: current_boss_hp, ...}` → `reset_for_retry(RetryContext.load_context())` called, **THEN** system is in a consistent state: player_hp = 100, boss_hp = preserved, entered_phases intact
 
 ---
 
@@ -85,7 +85,7 @@ func reset_for_retry(ctx: Dictionary) -> void:
 > **GUT naming rule**: file must start with `test_`. Do NOT use `class_name` on the test class.
 > Integration test may use a minimal scene with HealthDamageSystem + RetryContextNode (not full game scene).
 
-**Status**: [ ] Not yet created
+**Status**: [x] `game/tests/integration/health_damage/test_retry_reset.gd` — 9 test functions, all passing
 
 ---
 
@@ -93,3 +93,13 @@ func reset_for_retry(ctx: Dictionary) -> void:
 
 - Depends on: Stories 001–005 (full HP system must be DONE); `retry-context` Foundation epic must be DONE (RetryContextNode Autoload)
 - Unlocks: Feature layer epic — InstantRetrySystem can now wire the full retry flow
+
+---
+
+## Completion Notes
+**Completed**: 2026-06-04
+**Criteria**: 5/5 passing
+**Deviations**: None — implementation fully compliant with ADR-0003 and TR-HDS-007
+**Test Evidence**: Integration test at `game/tests/integration/health_damage/test_retry_reset.gd` (9 tests); includes both normal-flow and inverted-scenario coverage for AC-4
+**Code Review**: Complete — APPROVED WITH SUGGESTIONS (2026-06-04); all BLOCKING items fixed (typed array literals, AC-4 normal-flow test added)
+**Advisory**: AC-3 test uses signal-count proxy rather than direct structural assertion on `_entered_phases`; recommend adding `get_entered_phases() -> Dictionary` accessor in a follow-up story for stronger coverage

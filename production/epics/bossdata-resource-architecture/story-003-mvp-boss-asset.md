@@ -123,7 +123,9 @@ func _make_test_boss() -> BossData:
 
 ## QA Test Cases
 
-*Test cases not yet defined — run /qa-plan to generate them.*
+**Test file**: `game/tests/unit/bossdata-resource-architecture/test_boss_factory.gd` — 6/6 PASS (2026-06-02)
+
+**Manual spot-check**: Open `game/data/bosses/boss_01.tres` in Godot inspector and confirm `boss_max_hp=1000`, `phase_threshold_pct=[0.6, 0.3]`, `phases.size()=2`.
 
 **AC-1**: `_make_test_boss()` factory creates valid BossData in code
 - Given: GUT test file with `_make_test_boss()` helper

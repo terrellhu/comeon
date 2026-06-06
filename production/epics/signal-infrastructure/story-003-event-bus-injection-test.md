@@ -115,7 +115,29 @@ plumbing works, not testing gameplay logic.
 
 ## QA Test Cases
 
-*Test cases not yet defined — run /qa-plan to generate them.*
+**File**: `game/tests/integration/signal-infrastructure/test_event_bus_injection.gd`
+
+- **Mock has same interface**: MockEventBus declares all 13 signals matching real EventBus
+  - Given: MockEventBus loaded from `tests/helpers/mock_event_bus.gd`
+  - When: signal presence checked for each expected signal name
+  - Then: all signals present; no missing signal causes runtime error
+
+- **Inject mock prevents global emit**: System under test uses mock, not Autoload
+  - Given: mock injected into system constructor
+  - When: system emits a signal
+  - Then: mock's emission counter increments; global EventBus counter stays 0
+
+- **Fallback to Autoload**: Omitting injection uses global EventBus
+  - Given: system instantiated without injection parameter
+  - When: system emits
+  - Then: global EventBus signal fires
+
+- **Observable in assertions**: Mock emits are visible to GUT `assert_signal_emitted`
+  - Given: mock connected to a test Callable
+  - When: signal emitted through mock
+  - Then: Callable fires and recorded count matches expected
+
+- **Edge cases**: MockEventBus freed after each `after_each()` with no leaked children (8-children warning must not escalate to error)
 
 **AC-1**: MockEventBus has all 13 signals re-declared
 - Given: `game/tests/helpers/mock_event_bus.gd` is loaded in GUT

@@ -76,6 +76,17 @@ var boss_phase_changed_history: Array = []
 ## Incremented each time boss_defeated is emitted.
 var boss_defeated_call_count: int = 0
 
+# ─── Emission recording — attack_telegraphed ──────────────────────────────────
+
+## Incremented each time attack_telegraphed is emitted.
+var attack_telegraphed_call_count: int = 0
+
+## AttackType from the most recent attack_telegraphed emission.
+var last_attack_telegraphed_type: GameEnums.AttackType = GameEnums.AttackType.LIGHT
+
+## Damage from the most recent attack_telegraphed emission.
+var last_attack_telegraphed_damage: float = 0.0
+
 # ─── Setup ────────────────────────────────────────────────────────────────────
 
 func _ready() -> void:
@@ -84,6 +95,7 @@ func _ready() -> void:
 	boss_hp_changed.connect(_on_boss_hp_changed)
 	boss_phase_changed.connect(_on_boss_phase_changed)
 	boss_defeated.connect(_on_boss_defeated)
+	attack_telegraphed.connect(_on_attack_telegraphed)
 
 
 func _on_player_hp_changed(current: float, max_hp: float) -> void:
@@ -110,3 +122,9 @@ func _on_boss_phase_changed(from_phase: int, to_phase: int) -> void:
 
 func _on_boss_defeated() -> void:
 	boss_defeated_call_count += 1
+
+
+func _on_attack_telegraphed(attack_type: GameEnums.AttackType, damage: float) -> void:
+	attack_telegraphed_call_count += 1
+	last_attack_telegraphed_type = attack_type
+	last_attack_telegraphed_damage = damage

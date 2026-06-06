@@ -455,3 +455,133 @@ From instant-retry-system.md (Art Bible 7.5 同步后):
 - Test results: 76/84 pass, 8 pending (3 parry + 2 dodge + 3 attack_retry — all Input-deferred)
 - Blockers: None
 - Next: /code-review game/scripts/core/player_controller.gd game/tests/integration/player_controller/test_pc_dodge.gd then /story-done production/epics/player-controller/story-005-pc-dodge.md
+
+## Session Extract — /story-done 2026-06-03 (player-controller story-005)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/player-controller/story-005-pc-dodge.md — Dodge Signal Contract
+- Tests: 19/22 pass in test_pc_dodge.gd (3 pending: Input-injection deferrals for AC-dodge-idle, AC-dodge-running, AC-dodge-ended RUNNING branch)
+- Code Review: APPROVED WITH SUGGESTIONS — Required Changes applied (float <= 0.0 timer comparisons; fake-coverage test rename + pending stubs added; AC-dodge-ended RUNNING branch pending stub added)
+- Deviations: 1 ADVISORY — ADR-0004 drift (signal emission location); no tech debt logged (user chose Close without tech debt entry)
+- Out-of-scope pre-landing: Story 006 work landed early (reset_for_retry, test_pc_attack_retry.gd, attack_input_pressed.emit)
+- Next recommended: Story 006 (attack retry contract) — may be closeable without further coding; run /story-done production/epics/player-controller/story-006-pc-attack-retry.md to verify
+
+## Session Extract — /story-done 2026-06-03 (player-controller story-006)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/player-controller/story-006-pc-attack-retry.md — Attack Input Forwarding + Retry Reset
+- Tests: 24/27 pass in test_pc_attack_retry.gd (3 pending: Input-injection deferrals for AC-attack-idle, AC-attack-running, AC-attack-airborne)
+- Tech debt logged: None
+- No coding required — implementation pre-landed during Story 005's /dev-story run
+- AC-performance deferred (needs native Godot Profiler on Windows build)
+- Next recommended: Check epic status — all 6 stories may now be Complete; run /smoke-check sprint or epic close-out sequence
+
+<!-- QA-PLAN: 2026-06-03 | System: foundation-core sprint | Plan written: production/qa/qa-plan-foundation-core-2026-06-03.md -->
+
+## Session Extract — /dev-story 2026-06-03 (health-damage story-007)
+- Story: production/epics/health-damage-system/story-007-retry-reset-contract.md — Retry Reset Contract
+- Files changed: game/scripts/core/health_damage_system.gd (modified — reset_for_retry method added at line 244), game/tests/integration/health_damage/test_retry_reset.gd (new, 8 test functions)
+- Test written: game/tests/integration/health_damage/test_retry_reset.gd (8/8 PASS; 330/330 total suite — 306 passing, 24 pending, 0 failing)
+- Blockers: None
+- Next: /code-review game/scripts/core/health_damage_system.gd game/tests/integration/health_damage/test_retry_reset.gd then /story-done production/epics/health-damage-system/story-007-retry-reset-contract.md
+<!-- SMOKE-CHECK: 2026-06-03 | Verdict: PASS | Report: production/qa/smoke-2026-06-03.md | Tests: 298/322 passing, 24 pending, 0 failing -->
+
+## Session Extract — /story-done 2026-06-04 (health-damage story-007)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/health-damage-system/story-007-retry-reset-contract.md — Retry Reset Contract
+- Code review: APPROVED WITH SUGGESTIONS — 2 BLOCKING items fixed (typed array literals in test + AC-4 normal-flow test added); reset_for_retry got ctx.has() guard + updated doc comment
+- Test count: 9 test functions (was 8; added test_reset_is_boss_defeated_stays_false_when_boss_was_alive for AC-4 normal flow)
+- Tech debt logged: None (advisory AC-3 structural assertion noted in Completion Notes)
+- MILESTONE: All 5 epics × all stories = 100% Complete (signal-infrastructure, bossdata-resource-architecture, health-damage-system, player-controller, retry-context)
+- Next recommended: Sprint close-out sequence — /smoke-check sprint → /team-qa sprint → /retrospective → /gate-check
+<!-- SMOKE-CHECK: 2026-06-04 | Verdict: PASS | Report: production/qa/smoke-2026-06-04.md | Tests: 307/331 passing, 24 pending, 0 failing | +9 tests vs last check -->
+<!-- QA RUN: 2026-06-04 | Sprint: Foundation + Core Layer | Verdict: APPROVED WITH CONDITIONS | Report: production/qa/qa-signoff-foundation-core-2026-06-04.md | Conditions: 3 advisory deferrals (physics integration tests, HitpauseManager native timing, BossDataLoader debug run) -->
+<!-- RETROSPECTIVE: 2026-06-04 | Sprint: Foundation + Core Layer | Report: production/retrospectives/retro-sprint-foundation-core-2026-06-04.md | Key findings: 100% completion, 0 test failures, commit hygiene issue (all commits "各种"), 3 process action items -->
+<!-- GATE-CHECK: 2026-06-04 | Pre-Production → Production | Verdict: CONCERNS (user accepted) | Report: production/gate-checks/gate-check-pre-production-to-production-2026-06-04.md | stage.txt → Production | 3 conditions: sprint plan (Day 1), CONFLICT-01 (before InstantRetry), GAP-02 (before Parry/Counter) | Immediately unblocked: BossStateMachine, HUDSystem -->
+<!-- SPRINT-PLAN: 2026-06-04 | Sprint 002 created | Plan: production/sprints/sprint-002.md | Status: production/sprint-status.yaml | Goal: 5 Feature systems + gate conditions | Start: 2026-06-05 | Day 1 sequence: I01→I02→I03→I04 | Unblocked now: BossStateMachine, HUDSystem -->
+<!-- QA-PLAN: 2026-06-04 | System: sprint-002 | Plan written: production/qa/qa-plan-sprint-002-2026-06-04.md | 5 Feature systems + 4 infra tasks | ~84 automatable tests + 18 manual checks -->
+
+## Session Extract — /dev-story 2026-06-05 (boss-state-machine story-001)
+- Story: production/epics/boss-state-machine/story-001-bsm-skeleton.md — BSM Skeleton + IDLE/TELEGRAPHING/ATTACKING main path
+- Status: In Progress (implementation complete; awaiting /code-review + /story-done)
+- Files changed: game/scripts/feature/boss_state_machine.gd (new), game/tests/unit/boss_state_machine/test_bsm_skeleton.gd (new, 16 tests)
+- Test result: 16/16 BSM tests PASS; full suite 347 tests — 323 passing, 24 pending, 0 failing (+16 vs prior 331)
+- Decisions applied: (1) telegraph default-duration lookup DEFERRED to Story 003/TR-BSM-003 (only override>0 path implemented; push_error + named fallback const 0.1; no 0.8/1.2/1.5 literals). (2) AC-04 tests the real _on_attack_animation_done handler directly + a real-AnimationPlayer connection test.
+- Scope correction: reset_for_retry was pre-implemented by the agent but REMOVED — it is Story 005's deliverable (Out of Scope for 001); breadcrumb comment left in production file.
+- Test-harness fixes made during verification: class_name→preloaded-const (_BSM_SCRIPT) for headless cache safety; add_child_autofree typo; timers driven by real deltas (not pre-zeroed); initialize() before add_child; real Animation clip in connection test.
+- Blockers: None
+- Next: /code-review game/scripts/feature/boss_state_machine.gd game/tests/unit/boss_state_machine/test_bsm_skeleton.gd then /story-done production/epics/boss-state-machine/story-001-bsm-skeleton.md
+
+## Session Extract — /story-done 2026-06-05 (boss-state-machine story-001)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/boss-state-machine/story-001-bsm-skeleton.md — BSM Skeleton + IDLE/TELEGRAPHING/ATTACKING Main Path
+- Tech debt logged: 3 advisory items (tech-debt-register.md): @export underscore convention, missing _pending_anim_fallback cleanup test, EventBusBase pattern improvement
+- Code review run: APPROVED WITH SUGGESTIONS (same session)
+- sprint-status.yaml: s002-f01 → done (2026-06-05)
+- Next recommended: BSM Story 002 (STAGGERED state) — /story-readiness production/epics/boss-state-machine/story-002-bsm-stagger-sequence.md
+
+## Session Extract — /dev-story 2026-06-05 (boss-state-machine story-002)
+- Story: production/epics/boss-state-machine/story-002-bsm-stagger-sequence.md — STAGGERED + Sequence Index Formula
+- Status: In Progress (implementation complete; awaiting /code-review + /story-done)
+- Files changed: game/scripts/feature/boss_state_machine.gd (modified — _ready(), STAGGERED branches, 3 signal handlers), game/tests/unit/boss_state_machine/test_bsm_stagger_sequence.gd (new, 9 tests)
+- Test result: 9/9 Story 002 tests PASS; Story 001 16/16 still PASS; BSM total 25/25
+- Tech-debt test from Story 001 code review added: test_exit_attacking_clears_pending_anim_fallback ✅
+- Blockers: None
+- Next: /code-review game/scripts/feature/boss_state_machine.gd game/tests/unit/boss_state_machine/test_bsm_stagger_sequence.gd then /story-done production/epics/boss-state-machine/story-002-bsm-stagger-sequence.md
+
+## Session Extract — /story-done 2026-06-05 (boss-state-machine story-002)
+- Verdict: COMPLETE
+- Story: production/epics/boss-state-machine/story-002-bsm-stagger-sequence.md — STAGGERED + Sequence Index Formula
+- Tech debt logged: None
+- Next recommended: BSM Story 003 (DEFEATED state) — /story-readiness production/epics/boss-state-machine/story-003-bsm-defeated.md
+
+## Session Extract — /dev-story 2026-06-05 (boss-state-machine story-003)
+- Story: production/epics/boss-state-machine/story-003-bsm-defeated.md — DEFEATED Terminal State + BossData Injection
+- Status: In Progress (implementation complete; awaiting /code-review + /story-done)
+- Files changed: game/scripts/data/boss_data.gd (modified — default_telegraph_durations + get_default_telegraph_duration), game/scripts/feature/boss_state_machine.gd (modified — DEFEATED state, boss_defeated handler, real T_default lookup), game/tests/unit/boss_state_machine/test_bsm_defeated.gd (new, 11 tests)
+- Test result: 11/11 Story 003 PASS; Stories 001+002 still 16+11; BSM total 38/38
+- Minor note: _exit_state() match block does not have a DEFEATED case (harmless since terminal — GDScript silently ignores unmatched; advisory to add `DEFEATED: pass` in code review)
+- Blockers: None
+- Next: /code-review game/scripts/data/boss_data.gd game/scripts/feature/boss_state_machine.gd game/tests/unit/boss_state_machine/test_bsm_defeated.gd then /story-done production/epics/boss-state-machine/story-003-bsm-defeated.md
+
+## Session Extract — /story-done 2026-06-06 (boss-state-machine story-003)
+- Verdict: COMPLETE
+- Story: production/epics/boss-state-machine/story-003-bsm-defeated.md — DEFEATED Terminal State + BossData Injection
+- Tech debt logged: None
+- Next recommended: BSM Story 004 (phase transitions) — /story-readiness production/epics/boss-state-machine/story-004-bsm-phase-transition.md
+
+## Session Extract — /dev-story 2026-06-06 (boss-state-machine story-004)
+- Story: production/epics/boss-state-machine/story-004-bsm-phase-transition.md — Boss Phase Transitions (4 Source State Paths)
+- Status: In Progress (implementation complete; awaiting /code-review + /story-done)
+- Files changed: game/scripts/feature/boss_state_machine.gd (modified — PHASE_TRANSITION state, pending vars, boss_phase_changed handler, modified _on_attack_animation_done + _on_stagger_ended), game/tests/unit/boss_state_machine/test_bsm_phase_transition.gd (new, 13 tests)
+- Test result: 13/13 Story 004 PASS; total 51/51 across all 4 BSM test files
+- Blockers: None
+- Next: /code-review game/scripts/feature/boss_state_machine.gd game/tests/unit/boss_state_machine/test_bsm_phase_transition.gd then /story-done production/epics/boss-state-machine/story-004-bsm-phase-transition.md
+
+## Session Extract — /story-done 2026-06-06 (boss-state-machine story-004)
+- Verdict: COMPLETE
+- Story: production/epics/boss-state-machine/story-004-bsm-phase-transition.md — Boss Phase Transitions (4 Source State Paths)
+- Tech debt logged: None
+- Next recommended: BSM Story 005 (validation + reset) — /story-readiness production/epics/boss-state-machine/story-005-bsm-validation-reset.md
+
+## Session Extract — /dev-story 2026-06-06 (boss-state-machine story-005)
+- Story: production/epics/boss-state-machine/story-005-bsm-validation-reset.md — Data Validation + reset_for_retry
+- Status: In Progress (implementation complete; awaiting /code-review + /story-done)
+- Files changed: game/scripts/feature/boss_state_machine.gd (modified — MIN_TELEGRAPH_DURATION + _SUBFRAME_THRESHOLD consts, AC-20/21 validation in init_battle, AC-22 subframe clamp in _get_effective_telegraph_duration, ADR-0003 reset_for_retry method), game/tests/unit/boss_state_machine/test_bsm_validation_reset.gd (new, 18 tests)
+- Test result: 18/18 Story 005 PASS; BSM total 70/70 across all 5 test files
+- Deviations: AC-20 uses push_error + early return (not assert) — correct production-safe choice per Engine Notes; AC-19 is traceability stub (pre-landed in Story 004)
+- Blockers: None
+- Next: /code-review game/scripts/feature/boss_state_machine.gd game/tests/unit/boss_state_machine/test_bsm_validation_reset.gd then /story-done production/epics/boss-state-machine/story-005-bsm-validation-reset.md
+
+## Session Extract — /dev-story 2026-06-06 (parry-telegraph-system story-001)
+- Story: production/epics/parry-telegraph-system/story-001-pts-skeleton.md — ParryTelegraphSystem Skeleton
+- Status: In Progress (implementation complete; awaiting /code-review + /story-done)
+- Files changed: game/scripts/feature/parry_telegraph_system.gd (new, ~120 lines), game/tests/unit/parry_system/test_pts_skeleton.gd (new, 5 tests)
+- Test result: 5/5 PASS (GUT headless 0.463s)
+- Decisions: _warned_duplicate bool flag for AC-16 (push_warning not interceptable in GUT headless); window_open always false (Story 002 scope); _DEFAULT_DURATION_* consts placeholder (Story 002 will replace with AttackData lookup)
+- Blockers: None
+- Next: /code-review game/scripts/feature/parry_telegraph_system.gd game/tests/unit/parry_system/test_pts_skeleton.gd then /story-done production/epics/parry-telegraph-system/story-001-pts-skeleton.md
+
+## Session Extract — /story-done 2026-06-06 (boss-state-machine story-005)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/boss-state-machine/story-005-bsm-validation-reset.md — Data Validation + reset_for_retry
+- Tech debt logged: None (advisory deviations in Completion Notes only)
+- Next recommended: BSM Epic COMPLETE — all 5 stories done. Run sprint close-out sequence or start next epic (ParryTelegraphSystem / HUDSystem)

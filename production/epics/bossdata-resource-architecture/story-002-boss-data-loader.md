@@ -115,7 +115,7 @@ for i in range(1, data.phase_threshold_pct.size()):
 
 ## QA Test Cases
 
-*Test cases not yet defined — run /qa-plan to generate them.*
+**Test file**: `game/tests/unit/bossdata-resource-architecture/test_boss_data_loader.gd` — 8/13 PASS, 5 pending (assert() crash tests require Debug run)
 
 **AC-1**: Valid BossData passes validation silently
 - Given: `_make_test_boss()` factory creates valid BossData

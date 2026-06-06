@@ -65,7 +65,17 @@
 
 ## QA Test Cases
 
-*QL-STORY-READY skipped — Lean mode. Run `/qa-plan health-damage-system` to generate full test specifications.*
+**Test file**: `game/tests/unit/health_damage/test_player_healing.gd` — 9/9 PASS (2026-06-02)
+
+**GDD rule**: `apply_healing(PLAYER, amount)` clamps to `player_max_hp`; no over-heal
+
+- **Basic heal**: `apply_healing(PLAYER, 20.0)` with hp=60 → `current_player_hp = 80.0`; `player_hp_changed(80.0, 100.0)` emitted
+- **Over-heal guard**: `apply_healing(PLAYER, 100.0)` with hp=80 → `current_player_hp = 100.0` (clamped, not 180)
+- **Zero heal no-op**: `apply_healing(PLAYER, 0.0)` → HP unchanged
+- **Negative heal no-op**: `apply_healing(PLAYER, -10.0)` → HP unchanged (negative guard)
+- **Heal during invuln**: HP restored; invuln timer unaffected
+- **player_hp_changed emitted**: Signal fires on valid heal with `(current, max)` args
+- **Edge cases**: Heal from hp=0 (dead) → HP restored but dead state not cleared (HDS does not own player state)
 
 ---
 

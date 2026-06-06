@@ -223,9 +223,9 @@ func _resume_game() -> void:
     # PlayerController handles retry_invuln_duration via a separate timer
     # that starts in _physics_process after paused = false
 
-func _process(delta: float) -> void:
+func _unhandled_input(event: InputEvent) -> void:
     if get_tree().paused and death_screen_anim.is_playing():
-        if Input.is_anything_pressed():
+        if event.is_pressed() and not event.is_echo():
             death_screen_anim.stop()
             _resume_game()
 ```
@@ -276,7 +276,7 @@ func _process(delta: float) -> void:
 |---|---|---|---|
 | 某系统 reset_for_retry() 遗漏某个状态变量 | 中 | 重试后出现幽灵状态（如 hit_cooldown_active 残留） | GUT 集成测试: 触发 player_died → 验证每个系统所有状态变量; /regression-suite 覆盖 |
 | SceneTree.paused 后 delta 积累导致物理跳帧 | 低 | 重试后第一帧物理行为异常 | CharacterBody2D 在 PAUSEABLE 模式下 delta 不积累 (Godot 已处理); 验证重启后第一帧 delta 值 |
-| Input.is_anything_pressed() 在暂停期间误触发 | 低 | 死亡屏幕意外被跳过 | 仅在 RED_FLASH 阶段结束后（200ms）才开始监听跳过输入; 200ms 保护窗口防止死亡瞬间的残留输入 |
+| Input.is_anything_pressed() 在暂停期间误触发 | — | — | 已解决（S002-I01）：改用 `_unhandled_input(event)` + `event.is_pressed() and not event.is_echo()`，仅响应新按键事件，天然过滤持续按住的残留输入，无需 200ms 延迟 |
 
 ---
 
@@ -285,7 +285,7 @@ func _process(delta: float) -> void:
 | GDD System | Requirement | How This ADR Addresses It |
 |------------|-------------|--------------------------|
 | instant-retry-system.md | TR-IRS-003: 游戏逻辑时间在死亡屏幕期间暂停 | `SceneTree.paused = true` on player_died; game systems use default PROCESS_MODE_PAUSEABLE |
-| instant-retry-system.md | TR-IRS-004: 任意按键跳过死亡屏幕 | `_process(delta)` with PROCESS_MODE_ALWAYS polls `Input.is_anything_pressed()`; input window delayed 200ms |
+| instant-retry-system.md | TR-IRS-004: 任意按键跳过死亡屏幕（任意帧，含 RED_FLASH） | `_unhandled_input(event)` with PROCESS_MODE_ALWAYS; detects `event.is_pressed() and not event.is_echo()` — 仅响应新按键，不响应持续按住；任意帧生效，无 200ms 延迟 |
 | instant-retry-system.md | TR-IRS-005: RetryContext 保存三项数据 | `RetryContextNode.save_context(boss_hp, boss_phase, death_count)` |
 | instant-retry-system.md | TR-IRS-006: 场景重置必须在 1.5s 内完成 | In-place reset < 100ms; no asset I/O during reset |
 | instant-retry-system.md | TR-IRS-007: 重试后玩家满 HP、2.0s 无敌 | `health_system.reset_for_retry()` restores player_max_hp; invuln timer started on resume |
@@ -319,7 +319,7 @@ func _process(delta: float) -> void:
 
 - [ ] GUT 集成测试：触发 `EventBus.player_died.emit()` → 验证 1.5s 后 `SceneTree.paused == false`，player HP = 100，boss HP = preserved 值
 - [ ] 性能测试：`_execute_retry_reset()` wall-clock 时间 < 100ms（Godot 性能监视器测量）
-- [ ] 跳过测试：在 RED_FLASH + 50ms 时模拟按键输入 → 游戏恢复，不等待 1.5s
+- [ ] 跳过测试：在 RED_FLASH 期间（0ms 后即可）发送新按键事件（is_pressed=true, is_echo=false）→ 游戏恢复，不等待 1.5s；持续按住的按键（is_echo=true）不触发跳过
 - [ ] 阶段保留测试：Boss 进入 Phase 2 → 玩家死亡 → 重试 → Boss 仍在 Phase 2（不重新触发 phase_changed 信号）
 - [ ] Boss 击败测试：boss_defeated 信号发出 → RetryContext.preserved_boss_hp 清除为 -1.0 → 下次战斗 Boss 从满血开始
 

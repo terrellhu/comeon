@@ -81,7 +81,7 @@ const BossData = preload("res://scripts/data/boss_data.gd")
 
 ## QA Test Cases
 
-*Test cases not yet defined — run /qa-plan to generate them.*
+**Test file**: `game/tests/unit/bossdata-resource-architecture/test_bossdata_resources.gd` — 15/15 PASS (2026-06-02)
 
 **AC-1**: AttackData has correct @export fields
 - Given: `preload("res://scripts/data/attack_data.gd")` in GUT

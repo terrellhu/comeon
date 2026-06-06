@@ -104,7 +104,24 @@ Autoloads are added.
 
 ## QA Test Cases
 
-*Test cases not yet defined — run /qa-plan to generate them.*
+**File**: `game/tests/unit/signal-infrastructure/test_event_bus.gd`
+
+- **All signals declared**: EventBus node declares all typed signals — `player_hp_changed`, `boss_hp_changed`, `boss_phase_changed`, `player_died`, `boss_defeated`, `parry_input_pressed`, `dodge_input_pressed`, `attack_input_pressed`, `exit_parry_state`
+  - Given: EventBus autoload loaded in test
+  - When: `has_signal("player_died")` etc. checked for all expected signals
+  - Then: each returns true; none missing
+
+- **Autoload reachable**: EventBus accessible as `/root/EventBus` in GUT context
+  - Given: GUT test scene with autoloads registered
+  - When: `Engine.get_main_loop().root.get_node("EventBus")` called
+  - Then: returns the EventBus node (not null)
+
+- **Connect and emit**: Signals can be connected and emitted without runtime error
+  - Given: a Callable connected to `player_died`
+  - When: `player_died.emit()` called
+  - Then: Callable fires exactly once; no error
+
+- **Edge cases**: Connecting same callable twice does not produce duplicate calls (Godot default CONNECT_PERSIST does not duplicate)
 
 **AC-1**: All 13 signals declared with correct names and parameter types
 - Given: `game/autoloads/event_bus.gd` is parsed by Godot

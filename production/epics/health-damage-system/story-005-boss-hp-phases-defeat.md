@@ -71,7 +71,18 @@
 
 ## QA Test Cases
 
-*QL-STORY-READY skipped — Lean mode. Run `/qa-plan health-damage-system` to generate full test specifications.*
+**Test file**: `game/tests/unit/health_damage/test_boss_hp_phases.gd` — 18/18 PASS (2026-06-02)
+
+**GDD formulas**: F-02 `boss_damage_intake = counter_base_damage × multiplier[n]`; F-03 `phase_check_triggered = (hp / max) ≤ threshold AND phase NOT IN entered_phases`
+
+- **Boss damage reduces HP**: `apply_damage(BOSS, 70.0)` → `current_boss_hp -= 70.0`; `boss_hp_changed(current, max, phase)` emitted
+- **Phase trigger once**: HP crosses 60% → `boss_phase_changed(1, 2)` emitted exactly 1 time
+- **Phase idempotency**: Re-crossing same threshold (boundary bounce) → no second `boss_phase_changed`
+- **Boss defeat**: `current_boss_hp ≤ 0` → clamp to 0; `boss_defeated` emitted once
+- **Post-defeat no-op**: `apply_damage(BOSS, 10)` after defeat → silent no-op; `boss_defeated` not re-emitted
+- **Multi-threshold crossing**: Single damage crosses two thresholds → both `boss_phase_changed` signals emitted, lower phase number first (ascending order)
+- **entered_phases persistence**: After simulated retry, previously entered phases still in `entered_phases` — not re-triggered
+- **Edge cases** (GDD): `apply_damage(BOSS)` after `boss_defeated` → HP stays 0, no re-emit; phase signals fire in ascending order for multi-threshold hits
 
 ---
 
