@@ -1,7 +1,7 @@
 # Story 005: Reset + player_died/boss_defeated Guards
 
 > **Epic**: ParryTelegraphSystem
-> **Status**: Not Started
+> **Status**: In Progress
 > **Layer**: Feature
 > **Type**: Logic
 > **Estimate**: S
@@ -12,6 +12,8 @@
 
 **GDD**: `design/gdd/parry-telegraph-system.md` — Edge Cases (player_died, boss_defeated)
 **Requirements**: `TR-PTS-013`
+
+**Dependencies**: Story 004 (Complete) — `_handle_telegraph_timeout`, `_health_damage_system` injection pattern
 
 **ADR Governing Implementation**:
 - ADR-0003: `reset_for_retry(ctx)` contract — set `system_state = IDLE`, clear `telegraph_timer`

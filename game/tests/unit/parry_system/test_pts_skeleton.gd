@@ -12,13 +12,16 @@ const _PTS_SCRIPT: GDScript = preload("res://scripts/feature/parry_telegraph_sys
 
 var _pts: ParryTelegraphSystem
 var _mock_bus: MockEventBus
+var _mock_hds: MockHealthDamageSystem
 
 
 func before_each() -> void:
 	_mock_bus = MockEventBus.new()
 	add_child_autofree(_mock_bus)
+	_mock_hds = MockHealthDamageSystem.new()
+	add_child_autofree(_mock_hds)
 	_pts = _PTS_SCRIPT.new()
-	_pts.initialize(_mock_bus)
+	_pts.initialize(_mock_bus, _mock_hds)
 	add_child_autofree(_pts)
 
 

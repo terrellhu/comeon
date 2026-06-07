@@ -1,12 +1,13 @@
 # Story 003: Path A — Parry Success
 
 > **Epic**: ParryTelegraphSystem
-> **Status**: Not Started
+> **Status**: Complete
 > **Layer**: Feature
 > **Type**: Logic
 > **Estimate**: M
 > **Manifest Version**: 2026-06-06
 > **Last Updated**: 2026-06-06
+> **Started**: 2026-06-06
 
 ## Context
 
@@ -80,7 +81,16 @@
 
 ## Definition of Done
 
-- [ ] All ACs pass in GUT headless (0 failing)
-- [ ] `_on_parry_input_pressed()` handler implemented for Path A
-- [ ] `/code-review` APPROVED
-- [ ] `/story-done` run and Status → Complete
+- [x] All ACs pass in GUT headless (0 failing)
+- [x] `_on_parry_input_pressed()` handler implemented for Path A
+- [x] `/code-review` APPROVED
+- [x] `/story-done` run and Status → Complete
+
+## Completion Notes
+**Completed**: 2026-06-06
+**Criteria**: 8/8 passing
+**Deviations**:
+- ADVISORY: `exit_parry_state` duration payload value (0.4) not asserted in tests — recommend adding when duration becomes data-driven (Story 005+)
+- ADVISORY: just-below lower-boundary test (t=0.59s) absent — regression guard for `>=` operator; recommend adding in Story 004
+**Test Evidence**: Logic — `game/tests/unit/parry_system/test_pts_path_a.gd` (17 tests, 17 passing)
+**Code Review**: Complete — APPROVED WITH SUGGESTIONS (W-01 signal ordering fixed before close)

@@ -1,12 +1,14 @@
 # Story 004: Path B/C — Parry Failure + Empty Parry + Attack Landing
 
 > **Epic**: ParryTelegraphSystem
-> **Status**: Not Started
+> **Status**: Complete
 > **Layer**: Feature
 > **Type**: Logic
 > **Estimate**: M
 > **Manifest Version**: 2026-06-06
 > **Last Updated**: 2026-06-06
+> **Completed**: 2026-06-06
+> **Started**: 2026-06-06
 
 ## Context
 
@@ -65,7 +67,17 @@
 
 ## Definition of Done
 
-- [ ] All ACs pass in GUT headless (0 failing)
-- [ ] `_handle_telegraph_timeout()` and attack landing logic implemented
-- [ ] `/code-review` APPROVED
-- [ ] `/story-done` run and Status → Complete
+- [x] All ACs pass in GUT headless (0 failing)
+- [x] `_handle_telegraph_timeout()` and attack landing logic implemented
+- [x] `/code-review` APPROVED
+- [x] `/story-done` run and Status → Complete
+
+## Completion Notes
+
+**Completed**: 2026-06-06
+**Criteria**: 6/6 passing
+**Deviations**:
+- ADVISORY: `mock_health_damage_system.gd` created as valid scope extension (required for test injection, matches `mock_event_bus.gd` pattern)
+- ADVISORY: `mock_player_controller.gd` was untracked leftover from Story 003 — deleted before commit
+**Test Evidence**: `game/tests/unit/parry_system/test_pts_path_bc.gd` (27 tests, 27 passing; full suite 442/466, 0 failures)
+**Code Review**: Complete — CHANGES REQUIRED → fixed (GAP-1 AC-05 test added, AC-04 window test added, mock default value corrected, AC-19 target assertion added) → APPROVED

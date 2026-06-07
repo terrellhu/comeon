@@ -571,6 +571,12 @@ From instant-retry-system.md (Art Bible 7.5 同步后):
 - Blockers: None
 - Next: /code-review game/scripts/feature/boss_state_machine.gd game/tests/unit/boss_state_machine/test_bsm_validation_reset.gd then /story-done production/epics/boss-state-machine/story-005-bsm-validation-reset.md
 
+## Session Extract — /story-done 2026-06-06 (parry-telegraph-system story-001)
+- Verdict: COMPLETE
+- Story: production/epics/parry-telegraph-system/story-001-pts-skeleton.md — ParryTelegraphSystem Skeleton
+- Tech debt logged: None
+- Next recommended: PTS Story 002 (Window Timing Formula) — /dev-story production/epics/parry-telegraph-system/story-002-pts-window-timing.md
+
 ## Session Extract — /dev-story 2026-06-06 (parry-telegraph-system story-001)
 - Story: production/epics/parry-telegraph-system/story-001-pts-skeleton.md — ParryTelegraphSystem Skeleton
 - Status: In Progress (implementation complete; awaiting /code-review + /story-done)
@@ -585,3 +591,59 @@ From instant-retry-system.md (Art Bible 7.5 同步后):
 - Story: production/epics/boss-state-machine/story-005-bsm-validation-reset.md — Data Validation + reset_for_retry
 - Tech debt logged: None (advisory deviations in Completion Notes only)
 - Next recommended: BSM Epic COMPLETE — all 5 stories done. Run sprint close-out sequence or start next epic (ParryTelegraphSystem / HUDSystem)
+
+## Session Extract — /dev-story 2026-06-06 (parry-telegraph-system story-002)
+- Story: production/epics/parry-telegraph-system/story-002-pts-window-timing.md — Window Timing Formula + AttackData Override Lookup
+- Files changed: game/scripts/feature/parry_telegraph_system.gd (modified — added 4 new consts, 3 new state vars, 3 new private methods, updated _enter_state/_exit_state/_physics_process/_on_attack_telegraphed), game/tests/unit/parry_system/test_pts_window_timing.gd (new, 16 tests)
+- Test result: 16/16 PASS (GUT headless); Story 001 (5/5) also still passing; full suite 398/398 passing
+- Decisions: _current_attack_data private var (not public) — tests access via GDScript convention; _compute_window_times(attack_data) takes parameter; synthetic AttackData created in _on_attack_telegraphed (all overrides=0) for production default path; signal interface unchanged (story-001 tests preserved)
+- AC-23: literals 0.8/1.2/1.5/0.30/0.35/0.45/0.50 confirmed in const block only (grep verified)
+- Blockers: None
+- Next: /code-review game/scripts/feature/parry_telegraph_system.gd game/tests/unit/parry_system/test_pts_window_timing.gd then /story-done production/epics/parry-telegraph-system/story-002-pts-window-timing.md
+
+## Session Extract — /story-done 2026-06-06 (parry-telegraph-system story-002)
+- Verdict: COMPLETE
+- Story: production/epics/parry-telegraph-system/story-002-pts-window-timing.md — Window Timing Formula + AttackData Override Lookup
+- Tech debt logged: None
+- Next recommended: PTS Story 003 (Parry Success Path) — /dev-story production/epics/parry-telegraph-system/story-003-pts-parry-success.md
+
+## Session Extract — /dev-story 2026-06-06 (parry-telegraph-system story-003)
+- Story: production/epics/parry-telegraph-system/story-003-pts-path-a-success.md — Path A Parry Success
+- Files changed: game/scripts/feature/parry_telegraph_system.gd (modified — added signal exit_parry_state, const _DEFAULT_PARRY_ANIMATION_DURATION, _on_parry_input_pressed()), game/tests/unit/parry_system/test_pts_path_a.gd (new, 17 tests)
+- Test result: 17/17 PASS; full suite 415/439 (24 Pending known, 0 failures)
+- Decisions: exit_parry_state is a signal ON PTS (not EventBus, not method call on PlayerController per ADR-0001 1:1 exception); parry_succeeded via _event_bus (1:N); _on_parry_input_pressed() called directly in GUT (no MockPlayerController needed); signal order: parry_succeeded first, exit_parry_state second (AC-08)
+- Blockers: None
+- Next: /code-review game/scripts/feature/parry_telegraph_system.gd game/tests/unit/parry_system/test_pts_path_a.gd then /story-done production/epics/parry-telegraph-system/story-003-pts-path-a-success.md
+
+## Session Extract — /story-done 2026-06-06 (parry-telegraph-system story-003)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/parry-telegraph-system/story-003-pts-path-a-success.md — Path A Parry Success
+- Tech debt logged: None (2 ADVISORY items in Completion Notes)
+- W-01 fix applied before close: exit_parry_state.emit() moved after _transition_to(IDLE)
+- Next recommended: Story 004 — /dev-story production/epics/parry-telegraph-system/story-004-pts-path-b-c-failure.md
+
+## Session Extract — /dev-story 2026-06-06 (parry-telegraph-system story-004)
+- Story: production/epics/parry-telegraph-system/story-004-pts-path-bc-failure.md — Path B/C Parry Failure + Attack Landing
+- Files changed: game/scripts/feature/parry_telegraph_system.gd (modified — added _health_damage_system:Node, updated initialize(), updated _handle_telegraph_timeout()), game/tests/helpers/mock_health_damage_system.gd (new), game/tests/unit/parry_system/test_pts_path_bc.gd (new, 25 tests)
+- Test result: 25/25 PASS; full suite 440/464 (24 Pending, 0 failures)
+- Decisions: _health_damage_system typed as Node (not HealthDamageSystem) for mock injection; @warning_ignore("unsafe_method_access") on apply_damage call; apply_damage fires BEFORE parry_failed in _handle_telegraph_timeout()
+- Blockers: None
+- Next: /code-review game/scripts/feature/parry_telegraph_system.gd game/tests/unit/parry_system/test_pts_path_bc.gd then /story-done production/epics/parry-telegraph-system/story-004-pts-path-bc-failure.md
+
+## Session Extract — /story-done 2026-06-06 (parry-telegraph-system story-004)
+- Verdict: COMPLETE WITH NOTES
+- Story: production/epics/parry-telegraph-system/story-004-pts-path-bc-failure.md — Path B/C Parry Failure + Attack Landing
+- Code review: APPROVED (GAP-1 AC-05 test added, AC-04 window test added, mock default fixed, AC-19 target assertion added)
+- Test result: 27/27 PASS; full suite 442/466 (24 Pending, 0 failures)
+- Files changed: game/scripts/feature/parry_telegraph_system.gd, game/tests/helpers/mock_health_damage_system.gd, game/tests/unit/parry_system/test_pts_path_bc.gd
+- Deleted: game/tests/helpers/mock_player_controller.gd (unused leftover from Story 003)
+- Tech debt logged: None
+- Next recommended: Story 005 — /dev-story production/epics/parry-telegraph-system/story-005-pts-reset-guards.md
+
+## Session Extract — /dev-story 2026-06-06 (parry-telegraph-system story-005)
+- Story: production/epics/parry-telegraph-system/story-005-pts-reset-guards.md — Reset + player_died/boss_defeated Guards
+- Files changed: game/scripts/feature/parry_telegraph_system.gd (modified — player_died/boss_defeated handlers + reset_for_retry), game/tests/unit/parry_system/test_pts_reset_guards.gd (new, 12 tests)
+- Test result: 11/12 PASS, 1 pending (AC-22); full suite 453/478 (25 pending, 0 failures)
+- Decisions: _on_boss_defeated() takes no params (boss_defeated signal has no args); reset_for_retry sets fields directly (no _transition_to) to avoid signals; _exit_state(TELEGRAPHING) already clears timer/window_open
+- Blockers: None
+- Next: /code-review game/scripts/feature/parry_telegraph_system.gd game/tests/unit/parry_system/test_pts_reset_guards.gd then /story-done production/epics/parry-telegraph-system/story-005-pts-reset-guards.md
